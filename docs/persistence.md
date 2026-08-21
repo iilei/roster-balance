@@ -88,3 +88,27 @@ S3:
 - immutable snapshots
 - optional audit archives
 ```
+
+## Local Docker data
+
+The local PostgreSQL service uses the named Docker volume
+`roster_balance_postgres`, mounted at `/var/lib/postgresql` for PostgreSQL 18.
+Stopping or recreating containers does not remove this volume, so records survive
+both of these workflows:
+
+```bash
+docker compose stop
+docker compose start
+
+docker compose down
+docker compose up
+```
+
+To deliberately discard the local database, including all records, run:
+
+```bash
+docker compose down -v
+```
+
+The local database is disposable development state. Production data requires
+PostgreSQL backups and a recovery procedure; Docker volumes are not a backup.

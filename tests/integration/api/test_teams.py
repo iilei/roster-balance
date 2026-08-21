@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from roster_balance.main import app
 
-
 client = TestClient(app)
 
 
@@ -11,7 +10,9 @@ def test_team_crud_is_exposed_in_openapi_and_http() -> None:
     assert "/teams" in schema["paths"]
     assert "/teams/{team_id}" in schema["paths"]
 
-    created = client.post("/teams", json={"name": "Platform", "description": "Core services"})
+    created = client.post(
+        "/teams", json={"name": "Platform", "description": "Core services"}
+    )
     assert created.status_code == 201
     team = created.json()
     assert team["name"] == "Platform"

@@ -15,12 +15,14 @@ dependencies = [
     "alembic>=1.16,<2",
     "psycopg[binary]>=3.2,<4",
     "mangum>=0.19,<1",
+    "typer>=0.27.1",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.4,<9",
     "httpx>=0.28,<1",
+    "httpx2>=0.1",
     "ruff>=0.12,<1",
 ]
 
@@ -30,3 +32,21 @@ packages = ["src/roster_balance"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff.lint]
+extend-ignore = ["EM101", "TRY003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["INP001", "S101", "PLR2004"]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "httpx2>=0.1",
+]
+
+[tool.hatch.envs.hatch-test]
+features = ["dev"]
+
+[tool.hatch.envs.docs.scripts]
+openapi = "python -m roster_balance.generate_openapi"

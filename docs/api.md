@@ -1,6 +1,8 @@
 # REST-like API
 
-This is an initial resource model, not a frozen OpenAPI contract.
+This is an initial resource model, not a frozen OpenAPI contract. The generated
+OpenAPI document is available at `/openapi.json`, and interactive Swagger UI is
+available at `/docs` when the local API is running.
 
 ## Teams
 
@@ -11,6 +13,11 @@ GET    /teams/{team_id}
 PATCH  /teams/{team_id}
 DELETE /teams/{team_id}
 ```
+
+Team IDs are strings in the Proquint format. They are generated from a bounded
+numeric slot space after a seeded Feistel permutation. `TEAM_MAXIMUM` controls
+the maximum number of slots and therefore the fixed ID length; `TEAM_ID_SEED`
+must remain stable for an environment.
 
 ### Team membership
 

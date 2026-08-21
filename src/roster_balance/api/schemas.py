@@ -1,7 +1,6 @@
 """HTTP request and response schemas."""
 
 from datetime import datetime
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -20,7 +19,7 @@ class TeamPatch(BaseModel):
 class TeamResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: UUID
+    id: str
     name: str
     description: str | None
     active: bool

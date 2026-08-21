@@ -1,2 +1,18 @@
 [tools]
 python = "3.14.7"
+
+[tasks.fmt]
+description = "Format the project with Hatch"
+run = ["hatch check code --fix", "hatch check fmt --fix"]
+
+[tasks.update]
+description = "Prune stale Hatch environments"
+run = "hatch env prune"
+
+[tasks.test]
+description = "Run the test suite with Hatch"
+run = "hatch test"
+
+[tasks.openapi]
+description = "Start the local OpenAPI server with Docker Compose"
+run = "docker compose up --build api"

@@ -31,7 +31,12 @@ repos:
     hooks:
       - id: mypy
         args: ["--install-types", "--non-interactive"]
-        additional_dependencies: [types-tabulate, types-cachetools]
+        additional_dependencies:
+          - types-tabulate
+          - types-cachetools
+          - fastapi>=0.116,<1
+          - pydantic>=2.11,<3
+          - pytest>=8.4,<9
   # - repo: local
   #   hooks:
   #     - id: version_in_readme
@@ -48,6 +53,6 @@ repos:
       - id: generate_docs
         name: generate_docs
         entry: |-
-          bash -c 'hatch run docs:tex2md'
+          bash -c 'hatch run docs:openapi'
         language: system
         pass_filenames: false
