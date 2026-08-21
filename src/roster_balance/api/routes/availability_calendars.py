@@ -1,0 +1,1 @@
+"""Availability calendar API routes."""

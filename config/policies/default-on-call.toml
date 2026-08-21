@@ -1,0 +1,27 @@
+[policy]
+id = "default-on-call"
+version = 1
+description = "Initial example policy for on-call assignments."
+
+[[constraints]]
+id = "availability"
+type = "availability"
+
+[[constraints]]
+id = "minimum-rest"
+type = "minimum_rest"
+
+[constraints.params]
+hours = 24
+
+[[factors]]
+id = "historical-load"
+metric = "historical_load_deviation"
+weight = 100.0
+transform = "linear"
+
+[[factors]]
+id = "avoidance"
+metric = "member_avoidance"
+weight = 30.0
+transform = "linear"

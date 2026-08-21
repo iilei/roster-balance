@@ -1,0 +1,1 @@
+"""Minimum-rest hard constraint."""
