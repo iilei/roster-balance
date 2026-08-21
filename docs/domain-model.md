@@ -12,11 +12,11 @@ Team
 - updated_at
 ```
 
-Team IDs are stable, human-readable Proquint strings generated from a bounded
-numeric team slot. A seeded Feistel permutation maps slots before encoding them.
-The configured maximum team count determines the numeric domain and the fixed
-number of Proquint groups. The seed must remain stable for the lifetime of an
-environment; it is configuration, not a per-request value.
+Team IDs are database-generated UUIDs. They are the canonical internal
+identifiers used for persistence, relationships, and route paths. The proquint
+implementation remains available as a user-facing alias feature for scrubbed
+output and human-friendly random labels, but it is not the system’s technical
+identifier.
 
 ## User
 

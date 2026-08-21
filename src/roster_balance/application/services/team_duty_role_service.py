@@ -1,17 +1,22 @@
 """Application services for team duty roles."""
 
+from __future__ import annotations
+
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
     TeamOwnershipService,
 )
-from roster_balance.domain.models.principal import Principal
 from roster_balance.domain.models.team_duty_role import TeamDutyRole
-from roster_balance.domain.repositories.team_duty_role_repository import (
-    TeamDutyRoleRepository,
-)
+
+if TYPE_CHECKING:
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.team_duty_role_repository import (
+        TeamDutyRoleRepository,
+    )
 
 
 class DutyRoleNotFoundError(LookupError):

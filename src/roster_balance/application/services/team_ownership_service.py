@@ -1,12 +1,17 @@
 """Application services for team ownership."""
 
-from datetime import UTC, datetime
+from __future__ import annotations
 
-from roster_balance.domain.models.principal import Principal
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+
 from roster_balance.domain.models.team_ownership import TeamOwnership
-from roster_balance.domain.repositories.team_ownership_repository import (
-    TeamOwnershipRepository,
-)
+
+if TYPE_CHECKING:
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.team_ownership_repository import (
+        TeamOwnershipRepository,
+    )
 
 
 class OwnershipNotFoundError(LookupError):

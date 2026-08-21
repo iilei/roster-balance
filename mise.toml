@@ -5,9 +5,21 @@ python = "3.14.7"
 description = "Format the project with Hatch"
 run = ["hatch check code --fix", "hatch check fmt --fix"]
 
+[tasks.typecheck]
+description = "Run mypy against the project"
+run = "mypy src tests"
+
+[tasks.lint]
+description = "Run static type and lint checks"
+run = ["mise run typecheck", "hatch check code"]
+
 [tasks.update]
-description = "Prune stale Hatch environments"
-run = "hatch env prune"
+description = "Rebuild lockfile from scratch"
+run = [
+  "rm -f uv.lock",
+  "uv lock",
+  "uv sync --all-extras --dev"
+]
 
 [tasks.test]
 description = "Run the test suite with Hatch"

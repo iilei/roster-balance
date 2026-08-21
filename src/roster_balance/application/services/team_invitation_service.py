@@ -1,12 +1,14 @@
 """Application services for secure team invitations."""
 
+from __future__ import annotations
+
 import contextlib
 import hmac
 import secrets
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 from uuid import uuid4
 
 from roster_balance.application.services.team_ownership_service import (
@@ -14,16 +16,18 @@ from roster_balance.application.services.team_ownership_service import (
     OwnershipConflictError,
     TeamOwnershipService,
 )
-from roster_balance.application.services.user_service import UserService
-from roster_balance.domain.models.principal import Principal
 from roster_balance.domain.models.team_invitation import TeamInvitation
-from roster_balance.domain.repositories.team_invitation_repository import (
-    TeamInvitationRepository,
-)
+
+if TYPE_CHECKING:
+    from roster_balance.application.services.user_service import UserService
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.team_invitation_repository import (
+        TeamInvitationRepository,
+    )
 
 
 class InvitationSender(Protocol):
-    def send(self, email: str, token: str) -> None: ...
+    def send(self, invitation: TeamInvitation, token: str) -> None: ...
 
 
 class InvitationNotFoundError(LookupError):
@@ -98,7 +102,7 @@ class TeamInvitationService:
             expires_at=now + self._expiry,
         )
         saved = self._repository.add(invitation)
-        self._sender.send(normalized_email, token)
+        self._sender.send(saved, token)
         return saved
 
     def accept_invitation(

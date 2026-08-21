@@ -36,6 +36,23 @@ PostgreSQL
 
 Domain code should not depend on SQLAlchemy.
 
+## Schema migrations
+
+Alembic owns schema changes. After setting `DATABASE_URL` from the local
+age/SOPS-managed environment, inspect or apply migrations with:
+
+```bash
+alembic upgrade head
+alembic current
+alembic downgrade -1
+```
+
+The initial revision creates the currently implemented operational tables:
+teams, users, team memberships, duty roles, role-scoped roster eligibility, and
+team invitations. The local Compose application uses SQLAlchemy repositories
+against PostgreSQL; in-memory repositories remain available for unit tests and
+isolated local development.
+
 ## Initial relational model
 
 ```text

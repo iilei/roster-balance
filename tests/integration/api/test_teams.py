@@ -128,3 +128,9 @@ def test_owner_can_submit_generic_team_invitation() -> None:
 
     assert invitation.status_code == 202
     assert invitation.json() == {'status': 'accepted_for_delivery'}
+
+    delivery = client.get('/dev/invitations/latest/delivery')
+    assert delivery.status_code == 200
+    assert delivery.json()['mailto_url'].startswith('mailto:alice@example.com?')
+    assert '/invitations/' in delivery.json()['preview_url']
+    assert 'token=' in delivery.json()['preview_url']

@@ -1,12 +1,17 @@
 """Team invitation API routes."""
 
+import os
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from roster_balance.api.auth import get_principal
-from roster_balance.api.dependencies import get_team_invitation_service
+from roster_balance.api.dependencies import (
+    get_mailto_invitation_sender,
+    get_team_invitation_service,
+)
 from roster_balance.api.schemas import (
+    LocalInvitationDeliveryResponse,
     TeamInvitationAccept,
     TeamInvitationCreate,
     TeamInvitationPreviewResponse,
@@ -26,10 +31,14 @@ from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
 )
 from roster_balance.domain.models.principal import Principal
+from roster_balance.infrastructure.email.mailto_invitation_sender import (
+    MailtoInvitationSender,
+)
 
 router = APIRouter(tags=['invitations'])
 Invitation = Annotated[TeamInvitationService, Depends(get_team_invitation_service)]
 PrincipalDependency = Annotated[Principal, Depends(get_principal)]
+MailtoSender = Annotated[MailtoInvitationSender, Depends(get_mailto_invitation_sender)]
 
 
 @router.post(
@@ -52,6 +61,31 @@ def create_invitation(
         ) from error
     except InvitationResendCooldownError:
         return TeamInvitationSubmissionResponse(status='accepted_for_delivery')
+
+
+@router.get('/dev/invitations/latest/delivery')
+def get_latest_local_delivery(
+    sender: MailtoSender,
+) -> LocalInvitationDeliveryResponse:
+    if os.getenv('AUTHENTICATION_MODE', 'local') != 'local':
+        raise HTTPException(status_code=404, detail='Not found')
+    delivery = sender.latest()
+    if delivery is None:
+        raise HTTPException(status_code=404, detail='Delivery not found')
+    return LocalInvitationDeliveryResponse.model_validate(delivery)
+
+
+@router.get('/dev/invitations/{invitation_id}/delivery')
+def get_local_delivery(
+    invitation_id: str,
+    sender: MailtoSender,
+) -> LocalInvitationDeliveryResponse:
+    if os.getenv('AUTHENTICATION_MODE', 'local') != 'local':
+        raise HTTPException(status_code=404, detail='Not found')
+    delivery = sender.get(invitation_id)
+    if delivery is None:
+        raise HTTPException(status_code=404, detail='Delivery not found')
+    return LocalInvitationDeliveryResponse.model_validate(delivery)
 
 
 @router.get('/invitations/{invitation_id}/preview')

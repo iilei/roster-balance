@@ -1,19 +1,26 @@
 """Application services for roster eligibility."""
 
-from datetime import UTC, datetime
+from __future__ import annotations
 
-from roster_balance.application.services.team_duty_role_service import (
-    TeamDutyRoleService,
-)
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
-    TeamOwnershipService,
 )
-from roster_balance.domain.models.principal import Principal
 from roster_balance.domain.models.team_eligibility import TeamEligibility
-from roster_balance.domain.repositories.team_eligibility_repository import (
-    TeamEligibilityRepository,
-)
+
+if TYPE_CHECKING:
+    from roster_balance.application.services.team_duty_role_service import (
+        TeamDutyRoleService,
+    )
+    from roster_balance.application.services.team_ownership_service import (
+        TeamOwnershipService,
+    )
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.team_eligibility_repository import (
+        TeamEligibilityRepository,
+    )
 
 
 class EligibilityConflictError(ValueError):

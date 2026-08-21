@@ -1,17 +1,21 @@
 """Application-level orchestration for team operations."""
 
+from __future__ import annotations
+
 from dataclasses import replace
 from datetime import UTC, datetime
-from typing import cast
+from typing import TYPE_CHECKING, cast
+from uuid import uuid4
 
-from roster_balance.application.services.team_ownership_service import (
-    TeamOwnershipService,
-)
-from roster_balance.application.services.user_service import UserService
-from roster_balance.domain.models.principal import Principal
 from roster_balance.domain.models.team import Team
-from roster_balance.domain.repositories.team_repository import TeamRepository
-from roster_balance.domain.team_ids import TeamIdSpace
+
+if TYPE_CHECKING:
+    from roster_balance.application.services.team_ownership_service import (
+        TeamOwnershipService,
+    )
+    from roster_balance.application.services.user_service import UserService
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.team_repository import TeamRepository
 
 _UNSET = object()
 
@@ -23,20 +27,20 @@ class TeamNotFoundError(LookupError):
 class TeamNameConflictError(ValueError):
     """Raised when a team name is already in use."""
 
+    def __init__(self, name: str) -> None:
+        super().__init__(f'team name already in use: {name}')
+
 
 class TeamService:
     def __init__(
         self,
         repository: TeamRepository,
-        team_id_space: TeamIdSpace,
         user_service: UserService | None = None,
         ownership_service: TeamOwnershipService | None = None,
     ) -> None:
         self._repository = repository
-        self._team_id_space = team_id_space
         self._user_service = user_service
         self._ownership_service = ownership_service
-        self._next_slot = 0
 
     def list_teams(self) -> list[Team]:
         return self._repository.list()
@@ -60,13 +64,7 @@ class TeamService:
             team.name.casefold() == name.casefold() for team in self._repository.list()
         ):
             raise TeamNameConflictError(name)
-        while self._next_slot < self._team_id_space.maximum_teams:
-            team_id = self._team_id_space.encode_slot(self._next_slot)
-            self._next_slot += 1
-            if self._repository.get(team_id) is None:
-                break
-        else:
-            raise ValueError('maximum team count has been reached')
+        team_id = str(uuid4())
         now = datetime.now(UTC)
         team = self._repository.add(Team(team_id, name, description, True, now, now))
         if principal is not None:

@@ -47,6 +47,12 @@ mise run openapi
 Then open `http://localhost:8000/docs` for Swagger UI or
 `http://localhost:8000/openapi.json` for the raw schema.
 
+Database schema changes are managed with Alembic:
+
+```bash
+alembic upgrade head
+```
+
 If PostgreSQL failed during its first initialization, remove the failed local
 volume and start again:
 

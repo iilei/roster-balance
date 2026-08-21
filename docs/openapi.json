@@ -758,6 +758,69 @@
         }
       }
     },
+    "/dev/invitations/latest/delivery": {
+      "get": {
+        "tags": [
+          "invitations"
+        ],
+        "summary": "Get Latest Local Delivery",
+        "operationId": "get_latest_local_delivery_dev_invitations_latest_delivery_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalInvitationDeliveryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dev/invitations/{invitation_id}/delivery": {
+      "get": {
+        "tags": [
+          "invitations"
+        ],
+        "summary": "Get Local Delivery",
+        "operationId": "get_local_delivery_dev_invitations__invitation_id__delivery_get",
+        "parameters": [
+          {
+            "name": "invitation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Invitation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalInvitationDeliveryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/invitations/{invitation_id}/preview": {
       "get": {
         "tags": [
@@ -900,6 +963,34 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LocalInvitationDeliveryResponse": {
+        "properties": {
+          "invitation_id": {
+            "type": "string",
+            "title": "Invitation Id"
+          },
+          "mailto_url": {
+            "type": "string",
+            "title": "Mailto Url"
+          },
+          "preview_url": {
+            "type": "string",
+            "title": "Preview Url"
+          },
+          "accept_url": {
+            "type": "string",
+            "title": "Accept Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "invitation_id",
+          "mailto_url",
+          "preview_url",
+          "accept_url"
+        ],
+        "title": "LocalInvitationDeliveryResponse"
       },
       "MeResponse": {
         "properties": {

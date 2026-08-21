@@ -44,7 +44,7 @@ disable-model-invocation: false
 - Pre-commit hooks run in isolated environments. A mypy hook must declare every third-party package imported by files it checks in `additional_dependencies`, including `fastapi`, `pydantic`, and `pytest`.
 - Keep project dependency constraints consistent across `project.optional-dependencies`, dependency groups, and hook dependencies where all are maintained.
 - Regenerate `uv.lock` with `uv lock`; never hand-edit the lockfile.
-- For Starlette's current TestClient compatibility, use the project-declared `httpx2` version range and refresh the environment after changing it.
+- For Starlette's current TestClient compatibility, use the project dependency `httpx` and refresh the environment after changing dependency declarations. `httpx2` is a maintained successor in the broader ecosystem, but this project should not adopt it as a replacement unless the FastAPI/Starlette compatibility layer is intentionally migrated and revalidated together.
 
 ## Tests
 
@@ -55,7 +55,7 @@ disable-model-invocation: false
 
 ```text
 mise run fmt
-prek run mypy --all-files
+mise run typecheck
 pytest -q <focused-test-files>
 ```
 

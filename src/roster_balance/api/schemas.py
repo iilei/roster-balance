@@ -112,3 +112,12 @@ class TeamInvitationPreviewResponse(BaseModel):
 
 class TeamInvitationAccept(BaseModel):
     token: str = Field(min_length=1, max_length=512)
+
+
+class LocalInvitationDeliveryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    invitation_id: str
+    mailto_url: str
+    preview_url: str
+    accept_url: str

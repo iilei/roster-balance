@@ -17,44 +17,48 @@ from roster_balance.application.services.team_ownership_service import (
 )
 from roster_balance.application.services.team_service import TeamService
 from roster_balance.application.services.user_service import UserService
-from roster_balance.domain.team_ids import TeamIdSpace
-from roster_balance.infrastructure.email.in_memory_invitation_sender import (
-    InMemoryInvitationSender,
+from roster_balance.infrastructure.db.session import create_session_factory
+from roster_balance.infrastructure.email.mailto_invitation_sender import (
+    MailtoInvitationSender,
 )
-from roster_balance.infrastructure.repositories.in_memory_team_duty_role_repository import (
-    InMemoryTeamDutyRoleRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_team_duty_role_repository import (
+    SQLAlchemyTeamDutyRoleRepository,
 )
-from roster_balance.infrastructure.repositories.in_memory_team_eligibility_repository import (
-    InMemoryTeamEligibilityRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_team_eligibility_repository import (
+    SQLAlchemyTeamEligibilityRepository,
 )
-from roster_balance.infrastructure.repositories.in_memory_team_invitation_repository import (
-    InMemoryTeamInvitationRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_team_invitation_repository import (
+    SQLAlchemyTeamInvitationRepository,
 )
-from roster_balance.infrastructure.repositories.in_memory_team_ownership_repository import (
-    InMemoryTeamOwnershipRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_team_ownership_repository import (
+    SQLAlchemyTeamOwnershipRepository,
 )
-from roster_balance.infrastructure.repositories.in_memory_team_repository import (
-    InMemoryTeamRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_team_repository import (
+    SQLAlchemyTeamRepository,
 )
-from roster_balance.infrastructure.repositories.in_memory_user_repository import (
-    InMemoryUserRepository,
+from roster_balance.infrastructure.repositories.sqlalchemy_user_repository import (
+    SQLAlchemyUserRepository,
 )
 
-user_repository = InMemoryUserRepository()
-ownership_repository = InMemoryTeamOwnershipRepository()
+session_factory = create_session_factory()
+user_repository = SQLAlchemyUserRepository(session_factory)
+ownership_repository = SQLAlchemyTeamOwnershipRepository(session_factory)
 user_service = UserService(user_repository)
 team_ownership_service = TeamOwnershipService(ownership_repository)
 team_duty_role_service = TeamDutyRoleService(
-    InMemoryTeamDutyRoleRepository(), team_ownership_service
+    SQLAlchemyTeamDutyRoleRepository(session_factory), team_ownership_service
 )
 team_eligibility_service = TeamEligibilityService(
-    InMemoryTeamEligibilityRepository(),
+    SQLAlchemyTeamEligibilityRepository(session_factory),
     team_ownership_service,
     team_duty_role_service,
 )
-invitation_sender = InMemoryInvitationSender()
+mailto_invitation_sender = MailtoInvitationSender(
+    os.getenv('INVITATION_BASE_URL', 'http://localhost:8000')
+)
+invitation_sender = mailto_invitation_sender
 team_invitation_service = TeamInvitationService(
-    InMemoryTeamInvitationRepository(),
+    SQLAlchemyTeamInvitationRepository(session_factory),
     team_ownership_service,
     user_service,
     invitation_sender,
@@ -67,11 +71,7 @@ team_invitation_service = TeamInvitationService(
 )
 
 team_service = TeamService(
-    InMemoryTeamRepository(),
-    TeamIdSpace(
-        maximum_teams=int(os.getenv('TEAM_MAXIMUM', '1000000')),
-        seed=os.getenv('TEAM_ID_SEED', 'local-development'),
-    ),
+    SQLAlchemyTeamRepository(session_factory),
     user_service=user_service,
     ownership_service=team_ownership_service,
 )
@@ -99,3 +99,7 @@ def get_team_duty_role_service() -> TeamDutyRoleService:
 
 def get_team_invitation_service() -> TeamInvitationService:
     return team_invitation_service
+
+
+def get_mailto_invitation_sender() -> MailtoInvitationSender:
+    return mailto_invitation_sender

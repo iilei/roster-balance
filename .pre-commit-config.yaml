@@ -26,17 +26,13 @@ repos:
       - id: ruff-format
         args: [--config, ./pyproject.toml]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "a66e98df7b4aeeb3724184b332785976d062b92e"  # frozen: v1.19.1
+  - repo: local
     hooks:
       - id: mypy
-        args: ["--install-types", "--non-interactive"]
-        additional_dependencies:
-          - types-tabulate
-          - types-cachetools
-          - fastapi>=0.116,<1
-          - pydantic>=2.11,<3
-          - pytest>=8.4,<9
+        name: mypy (mise)
+        entry: mise run typecheck
+        language: system
+        pass_filenames: false
   # - repo: local
   #   hooks:
   #     - id: version_in_readme

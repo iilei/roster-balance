@@ -1,10 +1,15 @@
 """Application services for normalized users."""
 
-from datetime import UTC, datetime
+from __future__ import annotations
 
-from roster_balance.domain.models.principal import Principal
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+
 from roster_balance.domain.models.user import User
-from roster_balance.domain.repositories.user_repository import UserRepository
+
+if TYPE_CHECKING:
+    from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.repositories.user_repository import UserRepository
 
 
 class UserService:

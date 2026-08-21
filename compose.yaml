@@ -10,6 +10,7 @@ services:
       AUTHENTICATION_MODE: "local"
       INVITATION_TTL_HOURS: "4"
       INVITATION_RESEND_COOLDOWN_MINUTES: "15"
+      INVITATION_BASE_URL: "http://localhost:8000"
     ports:
       - "8000:8000"
     depends_on:
