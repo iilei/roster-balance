@@ -29,12 +29,43 @@ numeric slot space after a seeded Feistel permutation. `TEAM_MAXIMUM` controls
 the maximum number of slots and therefore the fixed ID length; `TEAM_ID_SEED`
 must remain stable for an environment.
 
+## Identity and ownership
+
+`GET /me` returns the normalized application user for the current principal.
+Local Compose runs with `AUTHENTICATION_MODE=local` and resolves the deterministic
+principal `local:dev`; it does not require an authorization header. Cloud mode
+will resolve a Cognito principal supplied by the API Gateway authorizer.
+
+Creating a team makes the current user its first owner. Owners can add or remove
+other team members through:
+
+```text
+GET    /teams/{team_id}/team-members?role=owner
+PUT    /teams/{team_id}/team-members/{user_id}
+DELETE /teams/{team_id}/team-members/{user_id}
+```
+
+Only an existing owner may change ownership, and a team must always retain at
+least one owner. Duplicate owners return `409`; unauthorized changes return
+`403`; removing the final owner returns `409`.
+
+Team association does not imply roster eligibility. Owners manage eligibility
+separately:
+
+```text
+GET    /teams/{team_id}/eligible-members
+PUT    /teams/{team_id}/eligible-members/{member_id}
+DELETE /teams/{team_id}/eligible-members/{member_id}
+```
+
+Only eligible members may be considered for roster assignments.
+
 ### Team membership
 
 ```text
-GET    /teams/{team_id}/members
-PUT    /teams/{team_id}/members/{member_id}
-DELETE /teams/{team_id}/members/{member_id}
+GET    /teams/{team_id}/team-members
+PUT    /teams/{team_id}/team-members/{user_id}
+DELETE /teams/{team_id}/team-members/{user_id}
 ```
 
 ## Members

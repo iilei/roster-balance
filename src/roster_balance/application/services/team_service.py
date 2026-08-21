@@ -4,6 +4,11 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from typing import cast
 
+from roster_balance.application.services.team_ownership_service import (
+    TeamOwnershipService,
+)
+from roster_balance.application.services.user_service import UserService
+from roster_balance.domain.models.principal import Principal
 from roster_balance.domain.models.team import Team
 from roster_balance.domain.repositories.team_repository import TeamRepository
 from roster_balance.domain.team_ids import TeamIdSpace
@@ -20,9 +25,17 @@ class TeamNameConflictError(ValueError):
 
 
 class TeamService:
-    def __init__(self, repository: TeamRepository, team_id_space: TeamIdSpace) -> None:
+    def __init__(
+        self,
+        repository: TeamRepository,
+        team_id_space: TeamIdSpace,
+        user_service: UserService | None = None,
+        ownership_service: TeamOwnershipService | None = None,
+    ) -> None:
         self._repository = repository
         self._team_id_space = team_id_space
+        self._user_service = user_service
+        self._ownership_service = ownership_service
         self._next_slot = 0
 
     def list_teams(self) -> list[Team]:
@@ -37,7 +50,12 @@ class TeamService:
             raise TeamNotFoundError(team_id)
         return team
 
-    def create_team(self, name: str, description: str | None) -> Team:
+    def create_team(
+        self,
+        name: str,
+        description: str | None,
+        principal: Principal | None = None,
+    ) -> Team:
         if any(
             team.name.casefold() == name.casefold() for team in self._repository.list()
         ):
@@ -50,7 +68,13 @@ class TeamService:
         else:
             raise ValueError("maximum team count has been reached")
         now = datetime.now(UTC)
-        return self._repository.add(Team(team_id, name, description, True, now, now))
+        team = self._repository.add(Team(team_id, name, description, True, now, now))
+        if principal is not None:
+            if self._user_service is None or self._ownership_service is None:
+                raise RuntimeError("team ownership services are not configured")
+            user = self._user_service.resolve(principal)
+            self._ownership_service.add_initial_owner(team.id, user.id)
+        return team
 
     def update_team(
         self,

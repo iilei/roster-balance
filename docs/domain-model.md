@@ -18,6 +18,51 @@ The configured maximum team count determines the numeric domain and the fixed
 number of Proquint groups. The seed must remain stable for the lifetime of an
 environment; it is configuration, not a per-request value.
 
+## User
+
+```text
+User
+- id
+- provider
+- subject
+- email
+- display_name
+- active
+- created_at
+- updated_at
+```
+
+`provider` and `subject` identify the external principal. The application user
+ID is derived from that identity for the local implementation and is intended
+to become a separately persisted application key when PostgreSQL identity
+bindings are added.
+
+## TeamMembership
+
+```text
+TeamMembership
+- team_id
+- user_id
+- role: owner | member
+- created_at
+```
+
+This is the organizational association and authorization relation. Creating a
+team creates its first membership with the `owner` role for the current user.
+Only an existing owner may change roles, and at least one owner must remain.
+
+## RosterEligibility
+
+```text
+RosterEligibility
+- team_id
+- member_id
+- created_at
+```
+
+Team membership does not imply roster eligibility. Eligibility is an explicit
+allowlist of roster participants used by planning.
+
 ## Member
 
 ```text

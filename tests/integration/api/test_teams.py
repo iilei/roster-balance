@@ -9,6 +9,8 @@ def test_team_crud_is_exposed_in_openapi_and_http() -> None:
     schema = client.get("/openapi.json").json()
     assert "/teams" in schema["paths"]
     assert "/teams/{team_id}" in schema["paths"]
+    assert "/teams/{team_id}/team-members" in schema["paths"]
+    assert "/teams/{team_id}/eligible-members" in schema["paths"]
 
     created = client.post(
         "/teams", json={"name": "Platform", "description": "Core services"}
@@ -58,3 +60,42 @@ def test_teams_can_be_searched_by_name_or_description() -> None:
 
     assert client.get("/teams", params={"q": "missing"}).json() == []
     assert client.get("/teams", params={"q": ""}).status_code == 422
+
+
+def test_team_creator_is_added_as_owner() -> None:
+    created = client.post("/teams", json={"name": "Owned team"})
+    assert created.status_code == 201
+
+    owners = client.get(
+        f"/teams/{created.json()['id']}/team-members", params={"role": "owner"}
+    )
+    assert owners.status_code == 200
+    assert owners.json()[0]["user_id"] == "local:dev"
+    assert owners.json()[0]["role"] == "owner"
+
+
+def test_team_membership_does_not_make_a_member_roster_eligible() -> None:
+    created = client.post("/teams", json={"name": "Eligibility team"})
+    team_id = created.json()["id"]
+
+    members = client.get(f"/teams/{team_id}/team-members")
+    eligible = client.get(f"/teams/{team_id}/eligible-members")
+
+    assert members.status_code == 200
+    assert eligible.status_code == 200
+    assert eligible.json() == []
+
+    added = client.put(f"/teams/{team_id}/eligible-members/member-1")
+    assert added.status_code == 201
+    assert added.json()["member_id"] == "member-1"
+
+    removed = client.delete(f"/teams/{team_id}/eligible-members/member-1")
+    assert removed.status_code == 204
+
+
+def test_me_returns_the_local_user() -> None:
+    response = client.get("/me")
+
+    assert response.status_code == 200
+    assert response.json()["principal"] == "local:dev"
+    assert response.json()["user"]["id"] == "local:dev"

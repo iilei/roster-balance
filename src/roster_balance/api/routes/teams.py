@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
+from roster_balance.api.auth import get_principal
 from roster_balance.api.dependencies import get_team_service
 from roster_balance.api.schemas import TeamCreate, TeamPatch, TeamResponse
 from roster_balance.application.services.team_service import (
@@ -11,6 +12,7 @@ from roster_balance.application.services.team_service import (
     TeamNotFoundError,
     TeamService,
 )
+from roster_balance.domain.models.principal import Principal
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
@@ -28,10 +30,14 @@ def list_teams(
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_team(payload: TeamCreate, service: Service) -> TeamResponse:
+def create_team(
+    payload: TeamCreate,
+    service: Service,
+    principal: Annotated[Principal, Depends(get_principal)],
+) -> TeamResponse:
     try:
         return TeamResponse.model_validate(
-            service.create_team(payload.name, payload.description)
+            service.create_team(payload.name, payload.description, principal)
         )
     except TeamNameConflictError as error:
         raise HTTPException(

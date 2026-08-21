@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import builtins
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
+    import builtins
+
     from roster_balance.domain.models.team import Team
 
 

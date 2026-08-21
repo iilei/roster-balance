@@ -7,6 +7,7 @@ services:
       DATABASE_URL: postgresql+psycopg://roster_balance:roster_balance@postgres:5432/roster_balance
       TEAM_MAXIMUM: "1000000"
       TEAM_ID_SEED: "local-development"
+      AUTHENTICATION_MODE: "local"
     ports:
       - "8000:8000"
     depends_on:

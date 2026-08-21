@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 
+from roster_balance.api.routes.me import router as me_router
+from roster_balance.api.routes.team_eligibility import router as team_eligibility_router
+from roster_balance.api.routes.team_owners import router as team_owners_router
 from roster_balance.api.routes.teams import router as teams_router
 
 app = FastAPI(
@@ -9,6 +12,9 @@ app = FastAPI(
 )
 
 app.include_router(teams_router)
+app.include_router(me_router)
+app.include_router(team_owners_router)
+app.include_router(team_eligibility_router)
 
 
 @app.get("/health")
