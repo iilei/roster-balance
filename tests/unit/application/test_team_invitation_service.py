@@ -4,6 +4,7 @@ import pytest
 
 from roster_balance.application.services.team_invitation_service import (
     InvitationExpiredError,
+    InvitationNotFoundError,
     InvitationStateError,
     InvitationTokenError,
     TeamInvitationService,
@@ -128,4 +129,21 @@ def test_invalid_and_expired_tokens_are_rejected() -> None:
             invitation.id,
             'wrong-token',
             Principal('local', 'bob'),
+        )
+
+
+def test_vacuum_removes_expired_pending_invitations() -> None:
+    service, _, _ = make_service(expiry=timedelta(days=-1))
+    invitation = service.create_invitation(
+        'team',
+        'expired@example.com',
+        Principal('local', 'owner'),
+    )
+
+    assert service.vacuum_expired() == 1
+    with pytest.raises(InvitationNotFoundError):
+        service.accept_invitation(
+            invitation.id,
+            'expired-token',
+            Principal('local', 'expired'),
         )

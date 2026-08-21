@@ -49,7 +49,7 @@ class TeamInvitationService:
         ownership_service: TeamOwnershipService,
         user_service: UserService,
         sender: InvitationSender,
-        expiry: timedelta = timedelta(days=7),
+        expiry: timedelta = timedelta(hours=4),
     ) -> None:
         self._repository = repository
         self._ownership_service = ownership_service
@@ -63,6 +63,7 @@ class TeamInvitationService:
         email: str,
         principal: Principal,
     ) -> TeamInvitation:
+        self._vacuum()
         if not self._ownership_service.is_owner(team_id, principal.user_id):
             raise OwnershipAuthorizationError(principal.user_id)
         normalized_email = self._normalize_email(email)
@@ -96,7 +97,7 @@ class TeamInvitationService:
             raise InvitationStateError(invitation.status)
         now = datetime.now(UTC)
         if now >= invitation.expires_at:
-            self._repository.save(replace(invitation, status='expired'))
+            self._repository.purge_expired(now)
             raise InvitationExpiredError(invitation_id)
         if not hmac.compare_digest(invitation.token_hash, self._hash_token(token)):
             raise InvitationTokenError(invitation_id)
@@ -113,6 +114,12 @@ class TeamInvitationService:
             accepted_by_user_id=user.id,
         )
         return self._repository.save(accepted)
+
+    def vacuum_expired(self) -> int:
+        return self._vacuum()
+
+    def _vacuum(self) -> int:
+        return self._repository.purge_expired(datetime.now(UTC))
 
     def _normalize_email(self, email: str) -> str:
         normalized = email.strip().casefold()

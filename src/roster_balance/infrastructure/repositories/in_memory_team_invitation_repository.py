@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from roster_balance.domain.models.team_invitation import TeamInvitation
 
 
@@ -29,3 +31,13 @@ class InMemoryTeamInvitationRepository:
     def save(self, invitation: TeamInvitation) -> TeamInvitation:
         self._invitations[invitation.id] = invitation
         return invitation
+
+    def purge_expired(self, now: datetime) -> int:
+        expired_ids = [
+            invitation_id
+            for invitation_id, invitation in self._invitations.items()
+            if invitation.status == 'pending' and invitation.expires_at <= now
+        ]
+        for invitation_id in expired_ids:
+            del self._invitations[invitation_id]
+        return len(expired_ids)

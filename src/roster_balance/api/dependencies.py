@@ -1,6 +1,7 @@
 """FastAPI dependency wiring for the application layer."""
 
 import os
+from datetime import timedelta
 
 from roster_balance.application.services.team_duty_role_service import (
     TeamDutyRoleService,
@@ -57,6 +58,9 @@ team_invitation_service = TeamInvitationService(
     team_ownership_service,
     user_service,
     invitation_sender,
+    expiry=timedelta(
+        hours=float(os.getenv('INVITATION_COOLDOWN_HOURS', '4')),
+    ),
 )
 
 team_service = TeamService(

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     import builtins
+    from datetime import datetime
 
     from roster_balance.domain.models.team_invitation import TeamInvitation
 
@@ -18,3 +19,5 @@ class TeamInvitationRepository(Protocol):
     def add(self, invitation: TeamInvitation) -> TeamInvitation: ...
 
     def save(self, invitation: TeamInvitation) -> TeamInvitation: ...
+
+    def purge_expired(self, now: datetime) -> int: ...

@@ -8,6 +8,7 @@ services:
       TEAM_MAXIMUM: "1000000"
       TEAM_ID_SEED: "local-development"
       AUTHENTICATION_MODE: "local"
+      INVITATION_COOLDOWN_HOURS: "4"
     ports:
       - "8000:8000"
     depends_on:

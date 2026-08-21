@@ -71,8 +71,11 @@ POST /invitations/{invitation_id}/accept
 
 Invitation creation accepts an email address and returns a generic `202 Accepted`
 response. It must not reveal whether the address already belongs to a user. The
-invitation token is single-use and expires after a configured period. Acceptance
-creates a `team-member` association only; it does not add roster eligibility.
+invitation token is single-use and expires after the system-wide
+`INVITATION_COOLDOWN_HOURS` period, which defaults to 4 hours. Expired pending
+invitations are automatically vacuumed when the invitation service is accessed;
+accepted and declined invitations remain available for audit. Acceptance creates
+a `team-member` association only; it does not add roster eligibility.
 
 ### Team membership
 
