@@ -1,12 +1,18 @@
 """Repository boundary for teams."""
 
-from typing import Protocol
+from __future__ import annotations
 
-from roster_balance.domain.models.team import Team
+import builtins
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from roster_balance.domain.models.team import Team
 
 
 class TeamRepository(Protocol):
-    def list(self) -> list[Team]: ...
+    def list(self) -> builtins.list[Team]: ...
+
+    def search(self, query: str) -> builtins.list[Team]: ...
 
     def get(self, team_id: str) -> Team | None: ...
 

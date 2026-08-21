@@ -28,6 +28,9 @@ class TeamService:
     def list_teams(self) -> list[Team]:
         return self._repository.list()
 
+    def search_teams(self, query: str) -> list[Team]:
+        return self._repository.search(query)
+
     def get_team(self, team_id: str) -> Team:
         team = self._repository.get(team_id)
         if team is None:

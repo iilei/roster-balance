@@ -14,6 +14,16 @@ PATCH  /teams/{team_id}
 DELETE /teams/{team_id}
 ```
 
+The collection endpoint supports case-insensitive substring search across team
+names and descriptions:
+
+```text
+GET /teams?q=platform
+```
+
+Search returns the normal team list shape and returns `200 []` when there are no
+matches. An omitted `q` returns all teams.
+
 Team IDs are strings in the Proquint format. They are generated from a bounded
 numeric slot space after a seeded Feistel permutation. `TEAM_MAXIMUM` controls
 the maximum number of slots and therefore the fixed ID length; `TEAM_ID_SEED`

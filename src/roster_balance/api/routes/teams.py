@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from roster_balance.api.dependencies import get_team_service
 from roster_balance.api.schemas import TeamCreate, TeamPatch, TeamResponse
@@ -19,8 +19,12 @@ Service = Annotated[TeamService, Depends(get_team_service)]
 
 
 @router.get("")
-def list_teams(service: Service) -> list[TeamResponse]:
-    return [TeamResponse.model_validate(team) for team in service.list_teams()]
+def list_teams(
+    service: Service,
+    q: Annotated[str | None, Query(min_length=1, max_length=200)] = None,
+) -> list[TeamResponse]:
+    teams = service.list_teams() if q is None else service.search_teams(q)
+    return [TeamResponse.model_validate(team) for team in teams]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

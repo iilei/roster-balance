@@ -39,3 +39,22 @@ def test_duplicate_team_names_are_rejected() -> None:
     assert first.status_code == 201
     duplicate = client.post("/teams", json={"name": "UNIQUE TEAM"})
     assert duplicate.status_code == 409
+
+
+def test_teams_can_be_searched_by_name_or_description() -> None:
+    client.post("/teams", json={"name": "Search Platform"})
+    client.post(
+        "/teams",
+        json={"name": "Operations", "description": "Platform support"},
+    )
+
+    by_name = client.get("/teams", params={"q": "SEARCH platform"})
+    assert by_name.status_code == 200
+    assert [team["name"] for team in by_name.json()] == ["Search Platform"]
+
+    by_description = client.get("/teams", params={"q": "SUPPORT"})
+    assert by_description.status_code == 200
+    assert [team["name"] for team in by_description.json()] == ["Operations"]
+
+    assert client.get("/teams", params={"q": "missing"}).json() == []
+    assert client.get("/teams", params={"q": ""}).status_code == 422

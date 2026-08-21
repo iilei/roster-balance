@@ -22,7 +22,7 @@ dependencies = [
 dev = [
     "pytest>=8.4,<9",
     "httpx>=0.28,<1",
-    "httpx2>=0.1",
+    "httpx2>=2.0,<3",
     "ruff>=0.12,<1",
 ]
 
@@ -42,7 +42,7 @@ extend-ignore = ["EM101", "TRY003"]
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
-    "httpx2>=0.1",
+    "httpx2>=2.0,<3",
 ]
 
 [tool.hatch.envs.hatch-test]

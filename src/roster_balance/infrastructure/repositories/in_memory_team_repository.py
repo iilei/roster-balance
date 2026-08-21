@@ -1,14 +1,29 @@
 """In-memory team repository for local development and tests."""
 
-from roster_balance.domain.models.team import Team
+from __future__ import annotations
+
+import builtins
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from roster_balance.domain.models.team import Team
 
 
 class InMemoryTeamRepository:
     def __init__(self) -> None:
         self._teams: dict[str, Team] = {}
 
-    def list(self) -> list[Team]:
+    def list(self) -> builtins.list[Team]:
         return sorted(self._teams.values(), key=lambda team: team.created_at)
+
+    def search(self, query: str) -> builtins.list[Team]:
+        normalized_query = query.casefold()
+        return [
+            team
+            for team in self.list()
+            if normalized_query in team.name.casefold()
+            or normalized_query in (team.description or "").casefold()
+        ]
 
     def get(self, team_id: str) -> Team | None:
         return self._teams.get(team_id)
