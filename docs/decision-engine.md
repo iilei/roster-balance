@@ -61,39 +61,45 @@ Example:
 historical_load_deviation * weight
 ```
 
-## TOML configuration
+## Versioned decision policies
 
-TOML describes policies declaratively.
+Decision policies are versioned application resources managed through the REST
+API and persisted with the operational data. An active policy is immutable, and
+each planning result records the exact policy ID and version used.
 
-Example:
+Policy definitions contain declarative references to constraints, metrics,
+scoring factors, weights, and transforms. They must not contain executable
+expressions, dynamic imports, or arbitrary formulas.
 
-```toml
-[policy]
-id = "default-on-call"
-version = 1
+Suggested endpoints:
 
-[[constraints]]
-id = "availability"
-type = "availability"
+```text
+GET   /teams/{team_id}/decision-policies
+POST  /teams/{team_id}/decision-policies
+GET   /teams/{team_id}/decision-policies/{policy_id}
+PATCH /teams/{team_id}/decision-policies/{policy_id}
+POST  /teams/{team_id}/decision-policies/{policy_id}/activate
+```
 
-[[constraints]]
-id = "minimum-rest"
-type = "minimum_rest"
+For local development and tests, a checked-in TOML fixture may seed a policy or
+provide representative input. TOML is not the authoritative runtime source.
 
-[constraints.params]
-hours = 24
+Example policy definition:
 
-[[factors]]
-id = "historical-load"
-metric = "historical_load_deviation"
-weight = 100.0
-transform = "linear"
-
-[[factors]]
-id = "avoidance"
-metric = "member_avoidance"
-weight = 30.0
-transform = "linear"
+```json
+{
+  "id": "default-on-call",
+  "version": 1,
+  "status": "active",
+  "constraints": [
+    {"id": "availability", "type": "availability"},
+    {"id": "minimum-rest", "type": "minimum_rest", "params": {"hours": 24}}
+  ],
+  "factors": [
+    {"id": "historical-load", "metric": "historical_load_deviation", "weight": 100.0, "transform": "linear"},
+    {"id": "avoidance", "metric": "member_avoidance", "weight": 30.0, "transform": "linear"}
+  ]
+}
 ```
 
 ## Safety / maintainability

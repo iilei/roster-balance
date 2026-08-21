@@ -1,1 +1,1 @@
-"""Typed configuration schema for decision policies."""
+"""Compatibility schema for optional local decision-policy fixtures."""

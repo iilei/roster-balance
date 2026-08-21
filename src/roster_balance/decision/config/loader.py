@@ -1,1 +1,1 @@
-"""Load and validate declarative TOML decision policies."""
+"""Compatibility loader for optional local decision-policy fixtures."""

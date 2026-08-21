@@ -14,7 +14,7 @@ The service should be:
 - backed primarily by PostgreSQL
 - testable without AWS
 - explainable in its planning decisions
-- extensible through declarative TOML decision policies
+- extensible through versioned, declarative decision policies
 
 ## Primary domain resources
 
