@@ -59,7 +59,10 @@ team_invitation_service = TeamInvitationService(
     user_service,
     invitation_sender,
     expiry=timedelta(
-        hours=float(os.getenv('INVITATION_COOLDOWN_HOURS', '4')),
+        hours=float(os.getenv('INVITATION_TTL_HOURS', '4')),
+    ),
+    resend_cooldown=timedelta(
+        minutes=float(os.getenv('INVITATION_RESEND_COOLDOWN_MINUTES', '15')),
     ),
 )
 

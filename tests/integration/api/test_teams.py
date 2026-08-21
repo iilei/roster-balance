@@ -127,5 +127,4 @@ def test_owner_can_submit_generic_team_invitation() -> None:
     )
 
     assert invitation.status_code == 202
-    assert 'token' not in invitation.json()
-    assert 'email' not in invitation.json()
+    assert invitation.json() == {'status': 'accepted_for_delivery'}

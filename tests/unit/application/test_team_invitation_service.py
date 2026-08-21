@@ -5,6 +5,8 @@ import pytest
 from roster_balance.application.services.team_invitation_service import (
     InvitationExpiredError,
     InvitationNotFoundError,
+    InvitationRecipientError,
+    InvitationResendCooldownError,
     InvitationStateError,
     InvitationTokenError,
     TeamInvitationService,
@@ -88,7 +90,7 @@ def test_acceptance_adds_member_and_cannot_be_replayed() -> None:
     accepted = service.accept_invitation(
         invitation.id,
         sender.sent[0][1],
-        Principal('local', 'alice'),
+        Principal('local', 'alice', 'alice@example.com'),
     )
 
     assert accepted.status == 'accepted'
@@ -99,7 +101,7 @@ def test_acceptance_adds_member_and_cannot_be_replayed() -> None:
         service.accept_invitation(
             invitation.id,
             sender.sent[0][1],
-            Principal('local', 'alice'),
+            Principal('local', 'alice', 'alice@example.com'),
         )
 
 
@@ -115,7 +117,7 @@ def test_invalid_and_expired_tokens_are_rejected() -> None:
         service.accept_invitation(
             invitation.id,
             sender.sent[0][1],
-            Principal('local', 'alice'),
+            Principal('local', 'alice', 'alice@example.com'),
         )
 
     service, sender, _ = make_service()
@@ -128,7 +130,7 @@ def test_invalid_and_expired_tokens_are_rejected() -> None:
         service.accept_invitation(
             invitation.id,
             'wrong-token',
-            Principal('local', 'bob'),
+            Principal('local', 'bob', 'bob@example.com'),
         )
 
 
@@ -145,5 +147,42 @@ def test_vacuum_removes_expired_pending_invitations() -> None:
         service.accept_invitation(
             invitation.id,
             'expired-token',
-            Principal('local', 'expired'),
+            Principal('local', 'expired', 'expired@example.com'),
         )
+
+
+def test_wrong_recipient_cannot_accept_valid_token() -> None:
+    service, sender, _ = make_service()
+    invitation = service.create_invitation(
+        'team', 'alice@example.com', Principal('local', 'owner')
+    )
+
+    with pytest.raises(InvitationRecipientError):
+        service.accept_invitation(
+            invitation.id,
+            sender.sent[0][1],
+            Principal('local', 'bob', 'bob@example.com'),
+        )
+
+
+def test_preview_requires_the_valid_invitation_token() -> None:
+    service, sender, _ = make_service()
+    invitation = service.create_invitation(
+        'team', 'alice@example.com', Principal('local', 'owner')
+    )
+
+    preview = service.preview_invitation(invitation.id, sender.sent[0][1])
+
+    assert preview.team_id == 'team'
+    assert preview.role == 'member'
+    with pytest.raises(InvitationTokenError):
+        service.preview_invitation(invitation.id, 'wrong-token')
+
+
+def test_resend_is_blocked_during_cooldown() -> None:
+    service, _, _ = make_service(expiry=timedelta(hours=4))
+    principal = Principal('local', 'owner')
+    service.create_invitation('team', 'alice@example.com', principal)
+
+    with pytest.raises(InvitationResendCooldownError):
+        service.create_invitation('team', 'ALICE@example.com', principal)

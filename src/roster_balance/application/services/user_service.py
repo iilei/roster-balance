@@ -21,7 +21,11 @@ class UserService:
                 id=f'{principal.provider}:{principal.subject}',
                 provider=principal.provider,
                 subject=principal.subject,
-                email=None,
+                email=(
+                    principal.verified_email.strip().casefold()
+                    if principal.verified_email is not None
+                    else None
+                ),
                 display_name=None,
                 active=True,
                 created_at=now,

@@ -17,6 +17,18 @@ class InMemoryTeamInvitationRepository:
     def get(self, invitation_id: str) -> TeamInvitation | None:
         return self._invitations.get(invitation_id)
 
+    def find_pending(self, team_id: str, email: str) -> TeamInvitation | None:
+        return next(
+            (
+                invitation
+                for invitation in self._invitations.values()
+                if invitation.team_id == team_id
+                and invitation.email == email
+                and invitation.status == 'pending'
+            ),
+            None,
+        )
+
     def list_for_team(self, team_id: str) -> list[TeamInvitation]:
         return [
             invitation

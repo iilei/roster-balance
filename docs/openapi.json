@@ -740,7 +740,60 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TeamInvitationResponse"
+                  "$ref": "#/components/schemas/TeamInvitationSubmissionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invitations/{invitation_id}/preview": {
+      "get": {
+        "tags": [
+          "invitations"
+        ],
+        "summary": "Preview Invitation",
+        "operationId": "preview_invitation_invitations__invitation_id__preview_get",
+        "parameters": [
+          {
+            "name": "invitation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Invitation Id"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamInvitationPreviewResponse"
                 }
               }
             }
@@ -1062,6 +1115,30 @@
         ],
         "title": "TeamInvitationCreate"
       },
+      "TeamInvitationPreviewResponse": {
+        "properties": {
+          "team_id": {
+            "type": "string",
+            "title": "Team Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "team_id",
+          "role",
+          "expires_at"
+        ],
+        "title": "TeamInvitationPreviewResponse"
+      },
       "TeamInvitationResponse": {
         "properties": {
           "id": {
@@ -1085,6 +1162,19 @@
           "expires_at"
         ],
         "title": "TeamInvitationResponse"
+      },
+      "TeamInvitationSubmissionResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "TeamInvitationSubmissionResponse"
       },
       "TeamOwnerResponse": {
         "properties": {

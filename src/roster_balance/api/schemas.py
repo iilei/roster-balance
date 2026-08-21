@@ -100,5 +100,15 @@ class TeamInvitationResponse(BaseModel):
     expires_at: datetime
 
 
+class TeamInvitationSubmissionResponse(BaseModel):
+    status: str
+
+
+class TeamInvitationPreviewResponse(BaseModel):
+    team_id: str
+    role: str
+    expires_at: datetime
+
+
 class TeamInvitationAccept(BaseModel):
     token: str = Field(min_length=1, max_length=512)

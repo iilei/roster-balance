@@ -141,10 +141,12 @@ docker compose down -v
 The local database is disposable development state. Production data requires
 PostgreSQL backups and a recovery procedure; Docker volumes are not a backup.
 
-Invitation expiry is configured system-wide with `INVITATION_COOLDOWN_HOURS`
-(default `4`). The application treats this as the lifetime of a pending
-invitation, not as a resend permission. Expired pending invitations are removed
-by a vacuum operation; terminal invitations are retained for audit. The local
-in-memory adapter runs this vacuum lazily on invitation creation and exposes it
-as an application operation. A PostgreSQL deployment should run the same cleanup
-from a scheduled worker or maintenance job.
+Invitation expiry is configured system-wide with `INVITATION_TTL_HOURS` (default
+`4`). Resend attempts are controlled independently by
+`INVITATION_RESEND_COOLDOWN_MINUTES` (default `15`). The application treats the
+TTL as the lifetime of a pending invitation, not as a resend permission.
+Expired pending invitations are removed by a vacuum operation; terminal
+invitations are retained for audit. The local in-memory adapter runs this vacuum
+lazily on invitation creation and exposes it as an application operation. A
+PostgreSQL deployment should run the same cleanup from a scheduled worker or
+maintenance job.
