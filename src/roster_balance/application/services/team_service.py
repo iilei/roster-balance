@@ -66,12 +66,12 @@ class TeamService:
             if self._repository.get(team_id) is None:
                 break
         else:
-            raise ValueError("maximum team count has been reached")
+            raise ValueError('maximum team count has been reached')
         now = datetime.now(UTC)
         team = self._repository.add(Team(team_id, name, description, True, now, now))
         if principal is not None:
             if self._user_service is None or self._ownership_service is None:
-                raise RuntimeError("team ownership services are not configured")
+                raise RuntimeError('team ownership services are not configured')
             user = self._user_service.resolve(principal)
             self._ownership_service.add_initial_owner(team.id, user.id)
         return team
@@ -81,7 +81,7 @@ class TeamService:
         team_id: str,
         *,
         name: str | None = None,
-        description: str | None | object = _UNSET,
+        description: str | object | None = _UNSET,
         active: bool | None = None,
     ) -> Team:
         team = self.get_team(team_id)
@@ -94,12 +94,12 @@ class TeamService:
             replace(
                 team,
                 name=name if name is not None else team.name,
-                description=cast("str | None", description)
+                description=cast('str | None', description)
                 if description is not _UNSET
                 else team.description,
                 active=active if active is not None else team.active,
                 updated_at=datetime.now(UTC),
-            )
+            ),
         )
 
     def delete_team(self, team_id: str) -> None:

@@ -16,31 +16,31 @@ from roster_balance.infrastructure.repositories.in_memory_team_ownership_reposit
 
 def test_owner_can_add_another_owner() -> None:
     repository = InMemoryTeamOwnershipRepository()
-    repository.add(TeamOwnership("team", "local:alice", datetime.now(UTC)))
+    repository.add(TeamOwnership('team', 'local:alice', 'owner', datetime.now(UTC)))
     service = TeamOwnershipService(repository)
 
-    added = service.add_owner("team", "local:bob", Principal("local", "alice"))
+    added = service.add_owner('team', 'local:bob', Principal('local', 'alice'))
 
-    assert added.user_id == "local:bob"
-    assert [owner.user_id for owner in service.list_owners("team")] == [
-        "local:alice",
-        "local:bob",
+    assert added.user_id == 'local:bob'
+    assert [owner.user_id for owner in service.list_owners('team')] == [
+        'local:alice',
+        'local:bob',
     ]
 
 
 def test_non_owner_cannot_add_owner() -> None:
     repository = InMemoryTeamOwnershipRepository()
-    repository.add(TeamOwnership("team", "local:alice", datetime.now(UTC)))
+    repository.add(TeamOwnership('team', 'local:alice', 'owner', datetime.now(UTC)))
     service = TeamOwnershipService(repository)
 
     with pytest.raises(OwnershipAuthorizationError):
-        service.add_owner("team", "local:bob", Principal("local", "bob"))
+        service.add_owner('team', 'local:bob', Principal('local', 'bob'))
 
 
 def test_last_owner_cannot_be_removed() -> None:
     repository = InMemoryTeamOwnershipRepository()
-    repository.add(TeamOwnership("team", "local:alice", datetime.now(UTC)))
+    repository.add(TeamOwnership('team', 'local:alice', 'owner', datetime.now(UTC)))
     service = TeamOwnershipService(repository)
 
     with pytest.raises(LastOwnerError):
-        service.remove_owner("team", "local:alice", Principal("local", "alice"))
+        service.remove_owner('team', 'local:alice', Principal('local', 'alice'))

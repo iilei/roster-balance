@@ -34,10 +34,44 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.ruff.lint]
-extend-ignore = ["EM101", "TRY003"]
+extend-ignore = [
+    'D100',    # Missing docstring in public module
+    'D104',    # Missing docstring in public package
+    'D107',    # Missing docstring in `__init__`
+    'D400',    # First line should end with a period'
+    'D401',    # First line of docstring should be in imperative mood'
+    'EM101',   # Exception must not use a string literal, assign to variable first
+    'EM102',   # Exception must not use an f-string literal, assign to variable first
+    'G004',    # Logging statement uses f-string
+    'TRY003',  # Avoid specifying long messages outside the exception class
+]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["INP001", "S101", "PLR2004"]
+"tests/**/*.py" = [
+    'D101',    # Missing docstring in public class
+    'D102',    # Missing docstring in public method
+    'D103',    # Missing docstring in public function
+    'D106',    # Missing docstring in public nested class
+    'INP001',  # implicit-namespace-package
+    'PLR0913', # Too many arguments in function definition
+    'S101',    # Use of `assert` detected
+    'SLF001',  # Private member accessed
+    "PLR2004"
+]
+
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+quote-style = 'single'
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = 'single'
+
+[tool.ruff.lint.pydocstyle]
+convention = 'pep257'
+
 
 [dependency-groups]
 dev = [

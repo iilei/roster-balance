@@ -10,7 +10,7 @@ class Principal:
 
     @property
     def user_id(self) -> str:
-        return f"{self.provider}:{self.subject}"
+        return f'{self.provider}:{self.subject}'
 
 
-DEV_PRINCIPAL = Principal(provider="local", subject="dev")
+DEV_PRINCIPAL = Principal(provider='local', subject='dev')

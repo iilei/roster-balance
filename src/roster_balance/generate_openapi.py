@@ -7,12 +7,12 @@ from roster_balance.main import app
 
 
 def main() -> None:
-    output_path = Path(__file__).parents[2] / "docs" / "openapi.json"
+    output_path = Path(__file__).parents[2] / 'docs' / 'openapi.json'
     output_path.write_text(
-        json.dumps(app.openapi(), indent=2) + "\n",
-        encoding="utf-8",
+        json.dumps(app.openapi(), indent=2) + '\n',
+        encoding='utf-8',
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -42,6 +42,8 @@ Domain code should not depend on SQLAlchemy.
 teams
 members
 team_memberships
+team_duty_roles
+team_roster_eligibility
 availability_calendars
 member_availability_calendars
 availability_entries
@@ -55,6 +57,32 @@ Important invariant:
 ```sql
 UNIQUE (member_id, calendar_type)
 ```
+
+Duty-role configuration and eligibility are separate relations:
+
+```text
+team_duty_roles
+- id
+- team_id
+- slug
+- display_name
+- description
+- active
+- created_at
+- updated_at
+- UNIQUE (team_id, slug)
+
+team_roster_eligibility
+- team_id
+- member_id
+- duty_role_id
+- duty_role
+- created_at
+- UNIQUE (team_id, member_id, duty_role_id)
+```
+
+Eligibility writes must verify in the application transaction that the member
+belongs to the team and the duty role belongs to that team and is active.
 
 for the member-to-availability-calendar relation.
 

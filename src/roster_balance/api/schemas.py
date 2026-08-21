@@ -51,7 +51,7 @@ class TeamOwnerResponse(BaseModel):
 
     team_id: str
     user_id: str
-    role: Literal["owner"] = "owner"
+    role: Literal['owner'] = 'owner'
     created_at: datetime
 
 
@@ -60,4 +60,45 @@ class TeamEligibilityResponse(BaseModel):
 
     team_id: str
     member_id: str
+    duty_role_id: str
+    duty_role: str
     created_at: datetime
+
+
+class TeamDutyRoleCreate(BaseModel):
+    slug: str = Field(min_length=1, max_length=80)
+    display_name: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class TeamDutyRoleResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    team_id: str
+    slug: str
+    display_name: str
+    description: str | None
+    active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class TeamEligibilityCreate(BaseModel):
+    member_id: str = Field(min_length=1, max_length=200)
+
+
+class TeamInvitationCreate(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+
+
+class TeamInvitationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    status: str
+    expires_at: datetime
+
+
+class TeamInvitationAccept(BaseModel):
+    token: str = Field(min_length=1, max_length=512)

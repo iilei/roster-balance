@@ -10,10 +10,10 @@ from roster_balance.api.schemas import MeResponse, UserResponse
 from roster_balance.application.services.user_service import UserService
 from roster_balance.domain.models.principal import Principal
 
-router = APIRouter(tags=["identity"])
+router = APIRouter(tags=['identity'])
 
 
-@router.get("/me")
+@router.get('/me')
 def get_me(
     principal: Annotated[Principal, Depends(get_principal)],
     service: Annotated[UserService, Depends(get_user_service)],

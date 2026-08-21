@@ -310,55 +310,6 @@
       }
     },
     "/teams/{team_id}/team-members/{user_id}": {
-      "put": {
-        "tags": [
-          "team-members"
-        ],
-        "summary": "Add Team Member",
-        "operationId": "add_team_member_teams__team_id__team_members__user_id__put",
-        "parameters": [
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "User Id"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeamOwnerResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "team-members"
@@ -448,13 +399,13 @@
         }
       }
     },
-    "/teams/{team_id}/eligible-members/{member_id}": {
-      "put": {
+    "/teams/{team_id}/eligible-members/{duty_role}": {
+      "get": {
         "tags": [
           "eligible-members"
         ],
-        "summary": "Add Eligible",
-        "operationId": "add_eligible_teams__team_id__eligible_members__member_id__put",
+        "summary": "List Role Eligible",
+        "operationId": "list_role_eligible_teams__team_id__eligible_members__duty_role__get",
         "parameters": [
           {
             "name": "team_id",
@@ -466,15 +417,78 @@
             }
           },
           {
-            "name": "member_id",
+            "name": "duty_role",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Member Id"
+              "title": "Duty Role"
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamEligibilityResponse"
+                  },
+                  "title": "Response List Role Eligible Teams  Team Id  Eligible Members  Duty Role  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "eligible-members"
+        ],
+        "summary": "Add Eligible",
+        "operationId": "add_eligible_teams__team_id__eligible_members__duty_role__post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "duty_role",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Duty Role"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamEligibilityCreate"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Successful Response",
@@ -497,13 +511,15 @@
             }
           }
         }
-      },
+      }
+    },
+    "/teams/{team_id}/eligible-members/{duty_role}/{member_id}": {
       "delete": {
         "tags": [
           "eligible-members"
         ],
         "summary": "Remove Eligible",
-        "operationId": "remove_eligible_teams__team_id__eligible_members__member_id__delete",
+        "operationId": "remove_eligible_teams__team_id__eligible_members__duty_role___member_id__delete",
         "parameters": [
           {
             "name": "team_id",
@@ -512,6 +528,15 @@
             "schema": {
               "type": "string",
               "title": "Team Id"
+            }
+          },
+          {
+            "name": "duty_role",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Duty Role"
             }
           },
           {
@@ -527,6 +552,250 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/duty-roles": {
+      "get": {
+        "tags": [
+          "duty-roles"
+        ],
+        "summary": "List Roles",
+        "operationId": "list_roles_teams__team_id__duty_roles_get",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamDutyRoleResponse"
+                  },
+                  "title": "Response List Roles Teams  Team Id  Duty Roles Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "duty-roles"
+        ],
+        "summary": "Create Role",
+        "operationId": "create_role_teams__team_id__duty_roles_post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDutyRoleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamDutyRoleResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/duty-roles/{role_id}": {
+      "delete": {
+        "tags": [
+          "duty-roles"
+        ],
+        "summary": "Deactivate Role",
+        "operationId": "deactivate_role_teams__team_id__duty_roles__role_id__delete",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "role_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Role Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/invitations": {
+      "post": {
+        "tags": [
+          "invitations"
+        ],
+        "summary": "Create Invitation",
+        "operationId": "create_invitation_teams__team_id__invitations_post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamInvitationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamInvitationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invitations/{invitation_id}/accept": {
+      "post": {
+        "tags": [
+          "invitations"
+        ],
+        "summary": "Accept Invitation",
+        "operationId": "accept_invitation_invitations__invitation_id__accept_post",
+        "parameters": [
+          {
+            "name": "invitation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Invitation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamInvitationAccept"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamInvitationResponse"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -623,6 +892,112 @@
         ],
         "title": "TeamCreate"
       },
+      "TeamDutyRoleCreate": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Slug"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Display Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "display_name"
+        ],
+        "title": "TeamDutyRoleCreate"
+      },
+      "TeamDutyRoleResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "team_id": {
+            "type": "string",
+            "title": "Team Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "team_id",
+          "slug",
+          "display_name",
+          "description",
+          "active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "TeamDutyRoleResponse"
+      },
+      "TeamEligibilityCreate": {
+        "properties": {
+          "member_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Member Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "member_id"
+        ],
+        "title": "TeamEligibilityCreate"
+      },
       "TeamEligibilityResponse": {
         "properties": {
           "team_id": {
@@ -632,6 +1007,14 @@
           "member_id": {
             "type": "string",
             "title": "Member Id"
+          },
+          "duty_role_id": {
+            "type": "string",
+            "title": "Duty Role Id"
+          },
+          "duty_role": {
+            "type": "string",
+            "title": "Duty Role"
           },
           "created_at": {
             "type": "string",
@@ -643,9 +1026,65 @@
         "required": [
           "team_id",
           "member_id",
+          "duty_role_id",
+          "duty_role",
           "created_at"
         ],
         "title": "TeamEligibilityResponse"
+      },
+      "TeamInvitationAccept": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "TeamInvitationAccept"
+      },
+      "TeamInvitationCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "TeamInvitationCreate"
+      },
+      "TeamInvitationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "expires_at"
+        ],
+        "title": "TeamInvitationResponse"
       },
       "TeamOwnerResponse": {
         "properties": {

@@ -41,31 +41,43 @@ other team members through:
 
 ```text
 GET    /teams/{team_id}/team-members?role=owner
-PUT    /teams/{team_id}/team-members/{user_id}
 DELETE /teams/{team_id}/team-members/{user_id}
 ```
 
-Only an existing owner may change ownership, and a team must always retain at
-least one owner. Duplicate owners return `409`; unauthorized changes return
-`403`; removing the final owner returns `409`.
+The collection supports owner-authorized removal of an existing team member.
+Invitations are the only public way to add a new team member, preventing callers
+from enumerating users or inventing membership IDs.
 
 Team association does not imply roster eligibility. Owners manage eligibility
 separately:
 
 ```text
 GET    /teams/{team_id}/eligible-members
-PUT    /teams/{team_id}/eligible-members/{member_id}
-DELETE /teams/{team_id}/eligible-members/{member_id}
+GET    /teams/{team_id}/eligible-members/{duty_role}
+POST   /teams/{team_id}/eligible-members/{duty_role}
+DELETE /teams/{team_id}/eligible-members/{duty_role}/{member_id}
 ```
 
 Only eligible members may be considered for roster assignments.
+
+## Invitations
+
+Owners invite people by email rather than searching a public user directory:
+
+```text
+POST /teams/{team_id}/invitations
+POST /invitations/{invitation_id}/accept
+```
+
+Invitation creation accepts an email address and returns a generic `202 Accepted`
+response. It must not reveal whether the address already belongs to a user. The
+invitation token is single-use and expires after a configured period. Acceptance
+creates a `team-member` association only; it does not add roster eligibility.
 
 ### Team membership
 
 ```text
 GET    /teams/{team_id}/team-members
-PUT    /teams/{team_id}/team-members/{user_id}
-DELETE /teams/{team_id}/team-members/{user_id}
 ```
 
 ## Members

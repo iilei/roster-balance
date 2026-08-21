@@ -23,7 +23,7 @@ class InMemoryTeamRepository:
             team
             for team in self.list()
             if normalized_query in team.name.casefold()
-            or normalized_query in (team.description or "").casefold()
+            or normalized_query in (team.description or '').casefold()
         ]
 
     def get(self, team_id: str) -> Team | None:

@@ -18,7 +18,7 @@ class UserService:
         now = datetime.now(UTC)
         return self._repository.add(
             User(
-                id=f"{principal.provider}:{principal.subject}",
+                id=f'{principal.provider}:{principal.subject}',
                 provider=principal.provider,
                 subject=principal.subject,
                 email=None,
@@ -26,5 +26,5 @@ class UserService:
                 active=True,
                 created_at=now,
                 updated_at=now,
-            )
+            ),
         )

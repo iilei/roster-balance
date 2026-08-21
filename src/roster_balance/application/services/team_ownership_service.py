@@ -30,30 +30,76 @@ class TeamOwnershipService:
         self._repository = repository
 
     def list_owners(self, team_id: str) -> list[TeamOwnership]:
+        return [
+            member
+            for member in self._repository.list_for_team(team_id)
+            if member.role == 'owner'
+        ]
+
+    def list_members(self, team_id: str) -> list[TeamOwnership]:
         return self._repository.list_for_team(team_id)
 
     def is_owner(self, team_id: str, user_id: str) -> bool:
-        return self._repository.get(team_id, user_id) is not None
+        membership = self._repository.get(team_id, user_id)
+        return membership is not None and membership.role == 'owner'
 
     def add_initial_owner(self, team_id: str, user_id: str) -> TeamOwnership:
         if self._repository.list_for_team(team_id):
             raise OwnershipConflictError(team_id)
-        return self._repository.add(TeamOwnership(team_id, user_id, datetime.now(UTC)))
+        return self._repository.add(
+            TeamOwnership(team_id, user_id, 'owner', datetime.now(UTC)),
+        )
 
-    def add_owner(
-        self, team_id: str, user_id: str, principal: Principal
+    def add_member(
+        self,
+        team_id: str,
+        user_id: str,
+        principal: Principal,
     ) -> TeamOwnership:
         if not self.is_owner(team_id, principal.user_id):
             raise OwnershipAuthorizationError(principal.user_id)
         if self._repository.get(team_id, user_id) is not None:
             raise OwnershipConflictError(user_id)
-        return self._repository.add(TeamOwnership(team_id, user_id, datetime.now(UTC)))
+        return self._repository.add(
+            TeamOwnership(team_id, user_id, 'member', datetime.now(UTC)),
+        )
+
+    def add_member_from_invitation(self, team_id: str, user_id: str) -> TeamOwnership:
+        if self._repository.get(team_id, user_id) is not None:
+            raise OwnershipConflictError(user_id)
+        return self._repository.add(
+            TeamOwnership(team_id, user_id, 'member', datetime.now(UTC)),
+        )
+
+    def add_owner(
+        self,
+        team_id: str,
+        user_id: str,
+        principal: Principal,
+    ) -> TeamOwnership:
+        if not self.is_owner(team_id, principal.user_id):
+            raise OwnershipAuthorizationError(principal.user_id)
+        if self._repository.get(team_id, user_id) is not None:
+            raise OwnershipConflictError(user_id)
+        return self._repository.add(
+            TeamOwnership(team_id, user_id, 'owner', datetime.now(UTC))
+        )
 
     def remove_owner(self, team_id: str, user_id: str, principal: Principal) -> None:
         if not self.is_owner(team_id, principal.user_id):
             raise OwnershipAuthorizationError(principal.user_id)
         if self._repository.get(team_id, user_id) is None:
             raise OwnershipNotFoundError(user_id)
-        if len(self._repository.list_for_team(team_id)) == 1:
+        if len(self.list_owners(team_id)) == 1:
+            raise LastOwnerError(team_id)
+        self._repository.delete(team_id, user_id)
+
+    def remove_member(self, team_id: str, user_id: str, principal: Principal) -> None:
+        if not self.is_owner(team_id, principal.user_id):
+            raise OwnershipAuthorizationError(principal.user_id)
+        membership = self._repository.get(team_id, user_id)
+        if membership is None:
+            raise OwnershipNotFoundError(user_id)
+        if membership.role == 'owner' and len(self.list_owners(team_id)) == 1:
             raise LastOwnerError(team_id)
         self._repository.delete(team_id, user_id)

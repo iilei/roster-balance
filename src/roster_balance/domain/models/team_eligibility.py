@@ -8,4 +8,6 @@ from datetime import datetime
 class TeamEligibility:
     team_id: str
     member_id: str
+    duty_role_id: str
+    duty_role: str
     created_at: datetime

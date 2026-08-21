@@ -37,7 +37,7 @@ ID is derived from that identity for the local implementation and is intended
 to become a separately persisted application key when PostgreSQL identity
 bindings are added.
 
-## TeamMembership
+## RosterTeamMembership
 
 ```text
 TeamMembership
@@ -57,11 +57,54 @@ Only an existing owner may change roles, and at least one owner must remain.
 RosterEligibility
 - team_id
 - member_id
+- duty_role_id
+- duty_role
 - created_at
 ```
 
 Team membership does not imply roster eligibility. Eligibility is an explicit
 allowlist of roster participants used by planning.
+
+Eligibility is scoped to a configured team duty role. A member may be eligible
+for multiple roles, and team membership alone does not grant eligibility.
+
+## TeamDutyRole
+
+```text
+TeamDutyRole
+- id
+- team_id
+- slug
+- display_name
+- description
+- active
+- created_at
+- updated_at
+```
+
+Duty roles are declarative team configuration. Their slugs form the namespace
+used by the eligible-members API.
+
+## TeamInvitation
+
+```text
+TeamInvitation
+- id
+- team_id
+- inviter_user_id
+- email
+- role: member
+- status: pending | accepted | declined | expired
+- token_hash
+- created_at
+- expires_at
+- accepted_at
+- accepted_by_user_id
+```
+
+Invitation tokens are generated randomly, stored only as hashes, expire, and may
+be accepted once. An accepted invitation creates organizational team membership;
+roster eligibility remains a separate explicit relation.
 
 ## Member
 
