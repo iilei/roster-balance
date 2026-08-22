@@ -31,6 +31,8 @@ disable-model-invocation: false
 - Use `TYPE_CHECKING` imports only when postponed annotations make the import unnecessary at runtime. Do not move imports that are required to construct runtime values or execute code.
 - Use `typing.Annotated` for FastAPI dependencies and parameter metadata, for example `Annotated[str | None, Query(...)]` and `Annotated[Service, Depends(...)]`.
 - Return the declared Pydantic response type from FastAPI handlers. Convert domain dataclasses explicitly with `ResponseModel.model_validate(...)` and use `from_attributes=True` when needed.
+- For Pydantic `mode='before'` validators, preserve normal request validation by raising `ValueError` (or a `ValueError` subclass) for invalid input; `TypeError` may escape instead of becoming a `ValidationError`.
+- When a Pydantic field accepts a raw API representation but stores a normalized type, test raw input with `Model.model_validate({...})` rather than a typed constructor call. This keeps mypy aligned with the normalized field annotation.
 
 ## Ruff Policy
 
@@ -51,6 +53,7 @@ disable-model-invocation: false
 - Use pytest assertions in test modules. If Ruff emits `S101`, allow it only for `tests/**/*.py`.
 - Add unit tests for domain/application invariants and focused integration tests for HTTP/OpenAPI behavior.
 - Include regression tests for collection-time import errors when annotation evaluation can fail.
+- Test both the raw accepted representation and the normalized stored/serialized representation for custom Pydantic fields.
 - Run, as applicable:
 
 ```text

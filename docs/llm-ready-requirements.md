@@ -29,6 +29,7 @@ Present:
 - [x] team, ownership, invitation, and eligibility service scaffolds
 - [x] project tooling and local workflow configuration
 - [x] core design docs for architecture, domain model, API, and decision engine
+- [x] compact factoring-entity duration parsing with canonical integer-second normalization
 
 Gaps:
 
@@ -104,6 +105,7 @@ These are mandatory and non-negotiable:
 - [x] Return explainable results showing eligibility, rejection reasons, raw values, weights, and selected candidate.
 - [ ] Use a declared policy model and versioned configuration.
 - [x] Keep the engine decoupled from data access and HTTP handling.
+- [x] Apply an explicit cooldown constraint using prior assignment end times and lane cooldown values.
 
 ### Persistence and schema
 
@@ -114,6 +116,8 @@ These are mandatory and non-negotiable:
 
 ### Calendar, scheduling, and policy semantics
 
+- [x] Factoring-entity duration input accepts strict `w`, `d`, `h`, and `m` tokens and normalizes to integer seconds.
+- [x] Factoring-entity duration limits are configurable through `MAX_FACTORING_ENTITY_DURATION_SECONDS` at the API boundary.
 - [ ] Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
 - [ ] Member calendar uploads must accept VCF files with an explicit effect field such as blocked or available.
 - [ ] The initial source format should be vcard and remain extensible.
@@ -147,6 +151,11 @@ Canonical naming preference:
 
 - [x] /teams/{team_id}/team-members for team association and roles
 - [x] /teams/{team_id}/eligible-members for roster participation eligibility
+
+Rest-rule resources:
+
+- [x] /teams/{team_id}/rest-rules
+- [x] /teams/{team_id}/rest-rules/{rest_rule_id}
 
 Resource-oriented calendar endpoints:
 
@@ -188,8 +197,9 @@ The next milestone should prioritize these in order:
 2. [x] Explicit roster eligibility APIs
 3. [x] Invitation lifecycle and onboarding
 4. [x] Explainable decision engine
-5. [ ] Calendar and scheduling foundations
-6. [ ] Persistence and verification
+5. [ ] Rest rules and roster-lane configuration
+6. [ ] Calendar and scheduling foundations
+7. [ ] Persistence and verification
 
 ## 7. Acceptance criteria
 
@@ -206,11 +216,11 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Wire the existing team, membership, eligibility, and invitation services to the
-SQLAlchemy repositories and FastAPI dependencies, then add PostgreSQL-backed
-integration tests. This establishes durable end-to-end behavior before building
-the calendar and scheduling foundations, and it provides the right place to add
-the missing case-insensitive team-name and team-alias migrations.
+Complete the cooldown vertical slice by introducing a persisted `RestRule`
+entity, replacing the lane's inline cooldown with a `rest_rule_id`, and adding
+owner-authorized REST-rule CRUD. Then resolve the stored rule into the decision
+context and add PostgreSQL-backed integration tests. The existing duration
+parser and minimum-rest constraint provide the domain foundation for this work.
 
 ## 8. Agent guidance
 

@@ -189,6 +189,22 @@ RosterLane
 - updated_at
 ```
 
+## RestRule
+
+```text
+RestRule
+- id
+- team_id
+- name
+- cooldown_after (integer seconds)
+- active
+- created_at
+- updated_at
+```
+
+Rest rules are team-owned configuration resources. A roster lane will reference
+a rest rule when lane configuration is connected to scheduling.
+
 A lane describes a staffing obligation, not the scoring policy itself. Its
 `duration` is the length of an assignment and `cooldown_after` is the recovery
 period required for the assigned member before another assignment may begin.

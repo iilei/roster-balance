@@ -116,6 +116,24 @@ class TeamDutyRoleModel(Base):
     )
 
 
+class RestRuleModel(Base):
+    __tablename__ = 'rest_rules'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    team_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('teams.id', ondelete='CASCADE'), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    cooldown_after: Mapped[int] = mapped_column(nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+
 class TeamEligibilityModel(Base):
     __tablename__ = 'team_roster_eligibility'
 

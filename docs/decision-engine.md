@@ -51,6 +51,13 @@ previous_assignment.ends_at + previous_assignment.cooldown_after
 The comparison is inclusive at the boundary. A failed result should identify
 the prior assignment end and the earliest eligible time.
 
+Factoring-entity durations use a strict compact form with `w`, `d`, `h`, and
+`m` units. Multiple whitespace-separated tokens are allowed, for example
+`1d 12h`. API input is normalized to integer seconds internally and returned
+as canonical integer seconds, such as `36h` becoming `129600`.
+Months, years, negative values, decimals, and partial token matches are not
+accepted. A configured maximum is checked after all tokens have been summed.
+
 ### Metric
 
 Measures something without deciding.

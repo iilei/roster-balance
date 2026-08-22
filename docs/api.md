@@ -114,6 +114,19 @@ and a `mailto:` link. It is unavailable outside local authentication mode.
 GET    /teams/{team_id}/team-members
 ```
 
+### Rest rules
+
+Rest rules are team-owned and can be managed by team owners. The API accepts
+compact duration strings such as `24h`, but returns the normalized cooldown as
+integer seconds.
+
+```text
+GET    /teams/{team_id}/rest-rules
+POST   /teams/{team_id}/rest-rules
+GET    /teams/{team_id}/rest-rules/{rule_id}
+DELETE /teams/{team_id}/rest-rules/{rule_id}
+```
+
 ## Members
 
 ```text
