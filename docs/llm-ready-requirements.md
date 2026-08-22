@@ -4,154 +4,132 @@ Status: Early-stage implementation foundation
 Date: 2026-08-22
 Repository: roster-balance
 
-## 1. Project objective
+## 1. Objective
 
-Build a service for creating, managing, validating, and explaining fair roster assignments for teams. The system must support:
+Build an explainable roster-planning service for team scheduling, membership management, eligibility controls, and operational policy enforcement.
+
+The system must support:
 
 - team and member management
-- team ownership and membership authorization
+- owner/member authorization boundaries
 - explicit roster eligibility separate from team membership
 - availability calendars and time constraints
-- declarative, explainable decision-making for roster planning
-- PostgreSQL-backed persistence with Alembic migrations
-- Dockerized local development and Lambda deployment compatibility
+- versioned, declarative decision policies
+- PostgreSQL persistence with Alembic migrations
+- local Docker development and Lambda-compatible deployment
 
-## 2. Current state summary
+## 2. Current repo status
 
-The project is structurally well-defined but not yet feature-complete.
+This repository is a structured foundation rather than a complete production implementation.
 
-### Verified project status
+Present:
 
-- Architecture and intent are documented in [README.md](../README.md), [docs/specification.md](specification.md), [docs/domain-model.md](domain-model.md), [docs/api.md](api.md), and [docs/decision-engine.md](decision-engine.md).
-- The app entry point exists in [src/roster_balance/main.py](../src/roster_balance/main.py).
-- The repo includes layered code organization under [src/roster_balance](../src/roster_balance): api, application, domain, infrastructure, and decision.
-- Core services and route modules are scaffolded for team, invitation, ownership, eligibility, and related flows.
-- Tooling is configured in [pyproject.toml](../pyproject.toml) and [mise.toml](../mise.toml).
-- A thin health endpoint exists in the FastAPI app.
+- layered application structure: API, application, domain, infrastructure, and decision engine
+- FastAPI bootstrap and health endpoint
+- team, ownership, invitation, and eligibility service scaffolds
+- project tooling and local workflow configuration
+- core design docs for architecture, domain model, API, and decision engine
 
-### Observed gaps
+Gaps:
 
-- The decision engine is not yet a complete production implementation.
-- The persistence layer is not yet fully realized as a complete end-to-end domain implementation.
-- The test suite is minimal and does not yet cover the core business flows or decision logic.
-- [docs/architecture.md](architecture.md) is empty and should be filled in or replaced with a working architecture summary.
-- The repo is best described as an architecture + skeleton foundation, not a finished product.
+- decision engine not yet complete
+- persistence layer not fully implemented end-to-end
+- limited business-logic test coverage
+- architecture docs still incomplete in places
 
-## 3. Hard architectural constraints
+## 3. Hard constraints
 
-These constraints are mandatory and should be treated as non-negotiable requirements.
+These are mandatory and non-negotiable:
 
-### Layer separation
-
-- Keep domain logic independent from HTTP/API concerns.
+- Keep domain logic independent from HTTP, AWS, and database concerns.
 - Keep application services responsible for orchestration.
 - Keep infrastructure code responsible for AWS, DB, and external integrations.
-- Keep decision-engine logic independent from datastore and HTTP concerns.
-
-### Domain constraints
-
-- Do not introduce AWS dependencies into domain or decision-engine code.
-- Do not introduce database access into the decision engine.
+- Keep the decision engine independent from datastore and HTTP code.
+- Do not add AWS dependencies to the domain or decision engine.
+- Do not add database access to the decision engine.
 - Do not add executable expressions to TOML policy configuration.
 - Use Alembic migrations for schema changes.
 - Preserve explainability of automated decisions.
-- Prefer a small explicit implementation over premature abstraction.
+- Prefer small, explicit implementations over premature abstraction.
 
 ### Team-modeling constraints
 
 - Team membership must not imply roster eligibility.
-- Team association/authorization roles are separate from roster eligibility.
+- Team association and owner/member roles are separate from roster eligibility.
 - Adding a user to a team must not make them assignable by default.
-- Team aliases should be short, human-friendly strings with a maximum length of 11 characters and a database-side uniqueness constraint so duplicate aliases are rejected.
+- Team aliases must be short, human-friendly strings with a maximum length of 11 characters.
+- Team aliases require a database-side uniqueness constraint so duplicate aliases are rejected.
 
 ### Invitation constraints
 
 - Prefer POST /teams/{team_id}/invitations with email and role.
-- Do not expose generic user/email search that allows enumeration or harvesting.
+- Do not expose generic user/email search that enables harvesting.
 - Invitation responses should be generic; use rate limiting, expiration, single-use tokens, audit, and owner authorization.
-- Local development should not send external emails; generate a preview artifact/tokenized output instead.
-- Mailto links are only a convenience when the acceptance base URL is reachable by the recipient; not for localhost-only flows.
+- Local development must not send external emails; generate a preview artifact or tokenized output instead.
+- Mailto links are allowed only when the acceptance base URL is reachable by the recipient.
 
 ## 4. Functional requirements
 
-### 4.1 Teams
-
-Required behavior:
+### Teams
 
 - Create, list, fetch, update, and delete teams.
-- Support API-level team membership and ownership semantics.
-- Require owner privileges for owner-sensitive actions.
+- Support owner-only administrative actions.
 - Prevent duplicate team names case-insensitively.
-- Keep a team user relationship separate from eligibility.
+- Keep membership and eligibility as separate relations.
 
-### 4.2 Members and membership
+### Members and membership
 
-Required behavior:
+- Represent members with a durable identity and properties.
+- Associate members with teams via explicit membership records.
+- Keep team membership and roster eligibility distinct.
+- Use owner-only membership management and invitation-based onboarding.
 
-- Represent members with their own identity and properties.
-- Associate members with teams through explicit team membership.
-- Keep team membership and roster eligibility as distinct relations.
-- Use owner-only team membership management and invitation-based onboarding flows.
-
-### 4.3 Team eligibility
-
-Required behavior:
+### Team eligibility
 
 - Allow explicit eligibility configuration per team and duty role.
-- Only eligible members can be considered for assignment at planning time.
-- Expose explicit collection and mutation APIs for eligible members.
+- Only explicitly eligible members can be considered in roster planning.
+- Expose explicit APIs for listing and mutating eligible members.
 
-### 4.4 Invitations
-
-Required behavior:
+### Invitations
 
 - Owner-authenticated invitation creation by email.
 - Single-use token flow with expiration.
 - Generic response semantics to avoid user enumeration.
 - Local preview generation without external email delivery.
-- Acceptance creates membership only and does not add roster eligibility automatically.
+- Acceptance creates membership only; it does not imply roster eligibility.
 
-### 4.5 Decision engine
-
-Required behavior:
+### Decision engine
 
 - Evaluate candidates using hard constraints, metrics, scoring rules, and deterministic tie-breaking.
-- Return explainable outputs showing eligibility, rejections, weighted contributions, and selected candidate.
+- Return explainable results showing eligibility, rejection reasons, raw values, weights, and selected candidate.
 - Use a declared policy model and versioned configuration.
-- Disallow arbitrary executable expressions in policy configuration.
 - Keep the engine decoupled from data access and HTTP handling.
 
-### 4.6 Persistence and schema
-
-Required behavior:
+### Persistence and schema
 
 - Use PostgreSQL as the primary persistence system.
 - Use Alembic for schema migrations.
 - Maintain clear mapping between domain models and persisted records.
 - Keep application and decision logic independent from raw DB operations.
 
-### 4.7 Calendar, scheduling, and policy semantics
+### Calendar, scheduling, and policy semantics
 
-The system must treat availability calendars, team calendars, and operational scheduling policies as distinct concepts.
-
-Required behavior:
-
-- Calendar URL paths must be resource-oriented; action names such as import must not appear in the route path.
-- Member calendar uploads must accept VCF files through multipart form data and include an explicit effect field with values such as blocked or available.
-- The initial source format must be vcard and remain extensible for future imports.
-- A calendar record must use a globally unique calendar ID regardless of whether it belongs to a member, team, or instance-level scope.
-- Team membership must not imply roster eligibility, and team ownership must not imply that a calendar is also a member calendar.
-- The planner must resolve member, team, and instance calendars with explicit precedence and explain the precedence in the decision output.
-- Team owners may maintain team-scoped fallback calendars when instance-level regional calendars are missing or stale.
-- Work schedules, office hours, yellow-response hours, and red-response hours are operating policy resources, not imported holiday calendars.
-- The default policy configuration must be team-agnostic and keyed by policy identity rather than team names.
+- Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
+- Member calendar uploads must accept VCF files with an explicit effect field such as blocked or available.
+- The initial source format should be vcard and remain extensible.
+- Calendar records must use a globally unique ID regardless of scope.
+- Team membership, team ownership, and member calendar ownership are distinct concepts.
+- The planner must resolve member, team, and instance calendars with explicit precedence and explain that precedence in the decision output.
+- Team owners may maintain team-scoped fallback calendars when instance-level calendars are missing or stale.
+- Work schedules and operating policies are distinct from imported holiday or availability calendars.
+- Default policies must be team-agnostic and keyed by policy identity rather than team names.
 - Time intervals must use start-inclusive, end-exclusive semantics.
-- The default time precision for planning and policy rules should be minute-level; nanosecond precision is not required for roster planning.
-- Exactly one calendar per calendar type per member scope must be enforceable, with duplicate creation rejected as a conflict.
+- Minute-level precision is the default expectation for planning and policy rules.
+- Exactly one calendar per calendar type per scope must be enforceable; duplicates must be rejected as a conflict.
 
 ## 5. API requirements
 
-The intended API directions include:
+Canonical resources:
 
 - /teams
 - /me
@@ -163,18 +141,14 @@ The intended API directions include:
 - /invitations/{invitation_id}/preview
 - /invitations/{invitation_id}/accept
 - roster lane and roster-related endpoints
-- planning/validation/explain commands for roster decisions
+- planning / validation / explain endpoints for roster decisions
 
-The canonical naming preference is:
+Canonical naming preference:
 
-- /teams/{team_id}/team-members for team association/roles
+- /teams/{team_id}/team-members for team association and roles
 - /teams/{team_id}/eligible-members for roster participation eligibility
 
-This distinction is important and should not be collapsed into a single concept.
-
-### Resource-oriented endpoint pattern
-
-The following are the agreed calendar and scheduling endpoints for the first implementation milestone:
+Resource-oriented calendar endpoints:
 
 - POST /members/{member_id}/availability-calendars
 - GET /members/{member_id}/availability-calendars
@@ -196,9 +170,7 @@ The following are the agreed calendar and scheduling endpoints for the first imp
 - GET /teams/{team_id}/work-schedule
 - PUT /teams/{team_id}/work-schedule
 
-The response payload for a created calendar record must return the globally unique calendar ID so the client can subsequently call PUT or DELETE using that ID.
-
-The payload contract for file-based calendar import must support the following fields:
+Calendar import payloads must support:
 
 - name
 - type
@@ -206,104 +178,33 @@ The payload contract for file-based calendar import must support the following f
 - effect
 - source_format
 - file
-- optional metadata such as country, state, county, and span_from/span_to for instance or team calendars
+- optional metadata such as country, state, county, and span_from/span_to
 
-## 6. Project delivery status by area
+## 6. Implementation priorities
 
-### Completed / present
-
-- Repo scaffolding and structure
-- Core architectural intent
-- Domain vocabulary and modeling guidance
-- Team-related service skeletons
-- FastAPI app bootstrap and health endpoint
-- Tooling and local dev commands
-
-### Near-term implementation priorities
-
-For the next milestone, the implementation should prioritize the following in order:
+The next milestone should prioritize these in order:
 
 1. Team ownership and membership flows
-   - complete team CRUD with owner-only authorization checks
-   - enforce duplicate-name validation and explicit membership records
-   - keep membership and eligibility as distinct relations
-
 2. Explicit roster eligibility APIs
-   - add the eligible-members resource model and update behavior
-   - ensure planning and scoring only consider explicitly eligible members
-   - preserve team membership and roster participation as separate concepts
-
 3. Invitation lifecycle and onboarding
-   - complete owner-authenticated invitation creation and acceptance flow
-   - use single-use tokens, expiration, audit metadata, and generic responses
-   - ensure acceptance grants membership but not implicit roster eligibility
-
 4. Explainable decision engine
-   - finish hard constraints, scoring, and deterministic ordering semantics
-   - return ranked candidates, rejections, and contributing factors in output
-   - keep policy configuration declarative and versioned without executable expressions
-
 5. Calendar and scheduling foundations
-   - implement resource-oriented calendar endpoints and VCF imports
-   - enforce explicit calendar precedence and per-scope uniqueness rules
-   - keep work schedules separate from imported holiday calendars
-
 6. Persistence and verification
-   - implement the required PostgreSQL persistence layer with Alembic migrations
-   - add targeted integration and unit tests for each domain boundary
-   - verify the app remains explainable and decoupled from infrastructure concerns
 
-This milestone should produce a working, testable baseline for team membership, eligibility, invitation onboarding, and explainable roster planning without conflating authorization with roster assignment authority.
+## 7. Acceptance criteria
 
-- Decision-engine conceptual design
-
-### In progress
-
-- Team ownership flow
-- Eligibility flow
-- Invitation flow
-- Service implementations
-- Integration with persistence
-- Decision logic implementation
-
-### Missing or incomplete
-
-- Complete persistence layer
-- Real business logic coverage
-- Full validation for roster planning behavior
-- Real decision-engine scoring implementation
-- Complete test coverage for domain and integration behaviors
-- Full documentation of architecture and infrastructure specifics
-
-## 7. Acceptance criteria for next implementation milestone
-
-The next milestone should be considered complete only when all of the following are true:
+The next milestone is complete only when:
 
 1. Team creation and ownership semantics work end-to-end.
 2. Team membership and roster eligibility are fully separated.
 3. Invitation flow works with generic responses and local preview artifacts.
-4. Alembic migrations cover required schema changes.
-5. Decision engine evaluates candidates using explicit constraints and explainable scoring.
-6. Tests cover core domain behavior, not just placeholder assertions.
-7. Project runs through the repo-managed workflow via Mise tasks.
-8. No AWS or DB access leaks into domain or decision-engine code.
+4. Alembic migrations cover the required schema changes.
+5. Decision engine evaluates candidates with explicit constraints and explainable scoring.
+6. Core domain behavior is covered by real tests.
+7. The project runs through the repo-managed Mise workflow.
+8. No AWS or DB concerns leak into the domain or decision-engine code.
 
-## 8. Recommended implementation order
-
-1. Finish the domain model and persistence contracts.
-2. Implement team membership and ownership services.
-3. Implement explicit eligibility management.
-4. Implement the invitation workflow and local delivery artifact.
-5. Implement scheduling/availability models.
-6. Implement decision policies and explainable scoring.
-7. Add end-to-end tests covering real behavior.
-8. Complete API docs and architecture docs.
-
-## 9. Working summary for an LLM agent
-
-Treat this as a greenfield but already-structured project with strong architectural intent. Do not broaden scope beyond the defined design. Keep domain, application, infrastructure, and decision concerns explicitly separated. Preserve explainability and explicit eligibility semantics. Prefer cloning the existing patterns in the repo over inventing a new architecture. Avoid adding AWS or database concerns to the decision engine, and avoid executable policy logic in TOML files.
-
-## 10. Immediate instruction to any future agent
+## 8. Agent guidance
 
 Before implementing new behavior:
 
@@ -312,7 +213,7 @@ Before implementing new behavior:
 - Read [docs/domain-model.md](domain-model.md)
 - Read [docs/api.md](api.md)
 - Read [docs/decision-engine.md](decision-engine.md)
-- Read [.github/copilot-instructions.md](../.github/copilot-instructions.md) if present in the repo
+- Read [.github/copilot-instructions.md](../.github/copilot-instructions.md) if present
 - Keep DB, AWS, and HTTP concerns out of the domain and decision-engine layers
 - Add or update tests for any domain behavior change
 - Use Mise-managed commands for verification when available
