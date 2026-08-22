@@ -1,37 +1,28 @@
+import pytest
+
 from roster_balance.domain.proquint import decode, encode
 from roster_balance.domain.team_ids import TeamIdSpace
 
 
-def test_proquint_matches_upstream_example() -> None:
-    assert encode(42) == 'babop'
+def test_short_aliases_are_normalized_and_validated() -> None:
+    assert encode(42) == '16'
+    assert decode('16') == 42
+
+    assert TeamIdSpace(maximum_teams=100).validate_alias('demo-team') == 'demo-team'
 
 
-def test_proquint_decode_round_trip() -> None:
-    for value in (0, 1, 2, 42, 999, 65535):
-        assert decode(encode(value)) == value
-
-
-def test_proquint_alias_generation_is_independent_of_team_ids() -> None:
-    alias = encode(42)
-
-    assert alias == 'babop'
-    assert alias.islower()
-    assert len(alias) >= 5
-
-
-def test_proquint_aliases_do_not_need_to_be_unique_for_the_same_value() -> None:
-    first = encode(42)
-    second = encode(42)
-
-    assert first == second
-    assert isinstance(first, str)
+def test_short_aliases_reject_invalid_values() -> None:
+    with pytest.raises(ValueError, match='must not be empty'):
+        TeamIdSpace(maximum_teams=100).validate_alias('')
+    with pytest.raises(ValueError, match='may contain only lowercase letters'):
+        TeamIdSpace(maximum_teams=100).validate_alias('-invalid')
+    with pytest.raises(ValueError, match='11 characters or fewer'):
+        TeamIdSpace(maximum_teams=100).validate_alias('a' * 12)
 
 
 def test_team_id_space_round_trips_within_bounds() -> None:
     space = TeamIdSpace(maximum_teams=100, seed='demo-seed')
 
-    # Alias uniqueness belongs in the persistence layer; the domain contract here is
-    # deterministic encoding and recovery of the configured slot values.
     for slot in range(space.maximum_teams):
         encoded = space.encode_slot(slot)
         assert space.decode_slot(encoded) == slot

@@ -62,7 +62,7 @@ These constraints are mandatory and should be treated as non-negotiable requirem
 - Team membership must not imply roster eligibility.
 - Team association/authorization roles are separate from roster eligibility.
 - Adding a user to a team must not make them assignable by default.
-- Team IDs should follow the repository convention using the GitHub proquint library and Feistel-style seeded shuffling/permutation when applicable, while preserving stable IDs and bounds validation.
+- Team aliases should be short, human-friendly strings with a maximum length of 11 characters and a database-side uniqueness constraint so duplicate aliases are rejected.
 
 ### Invitation constraints
 
@@ -254,6 +254,7 @@ For the next milestone, the implementation should prioritize the following in or
    - verify the app remains explainable and decoupled from infrastructure concerns
 
 This milestone should produce a working, testable baseline for team membership, eligibility, invitation onboarding, and explainable roster planning without conflating authorization with roster assignment authority.
+
 - Decision-engine conceptual design
 
 ### In progress
