@@ -15,6 +15,7 @@ dependencies = [
     "alembic>=1.16,<2",
     "psycopg[binary]>=3.2,<4",
     "mangum>=0.19,<1",
+    "vobject>=0.9.9,<1",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +24,7 @@ dev = [
     "httpx",
     "ruff",
     "mypy",
+    "types-vobject",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -83,6 +85,7 @@ dev = [
     "httpx",
     "ruff",
     "mypy",
+    "types-vobject",
 ]
 
 [tool.hatch.envs.default]

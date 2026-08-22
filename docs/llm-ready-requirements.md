@@ -31,6 +31,7 @@ Present:
 - [x] core design docs for architecture, domain model, API, and decision engine
 - [x] compact factoring-entity duration parsing with canonical integer-second normalization
 - [x] owner-managed team-scoped availability calendars and availability entries
+- [x] minimal iCalendar VEVENT parsing with an explicit availability effect
 
 Gaps:
 
@@ -122,8 +123,9 @@ These are mandatory and non-negotiable:
 - [x] Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
 - [x] Calendar types and availability effects are validated at the application boundary.
 - [x] Calendar type uniqueness per team member is enforced in the application and database model.
-- [ ] Member calendar uploads must accept VCF files with an explicit effect field such as blocked or available.
-- [ ] The initial source format should be vcard and remain extensible.
+- [ ] Member calendar uploads must accept iCalendar files with an explicit effect field such as blocked or available.
+- [x] The domain can parse iCalendar VEVENT entries with an explicit `available` or `unavailable` effect.
+- [ ] The initial source format should be icalendar and remain extensible.
 - [ ] Calendar records must use a globally unique ID regardless of scope.
 - [ ] Team membership, team ownership, and member calendar ownership are distinct concepts.
 - [ ] The planner must resolve member, team, and instance calendars with explicit precedence and explain that precedence in the decision output.
@@ -228,10 +230,11 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Complete calendar management by adding PATCH operations, member-scoped calendar
-associations, VCF upload/import with explicit effects, and PostgreSQL-backed
-integration tests. Then implement calendar precedence in the decision context
-and connect availability entries to the existing hard-constraint pipeline.
+Wire the iCalendar parser into the owner-managed calendar API using a multipart
+upload with an explicit effect and `source_format=icalendar`, then persist the parsed
+entries transactionally. Follow that with member-scoped calendar associations,
+PostgreSQL-backed integration tests, calendar precedence in the decision
+context, and the availability hard constraint.
 
 ## 8. Agent guidance
 

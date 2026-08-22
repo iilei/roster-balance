@@ -156,6 +156,9 @@ Team owners can file calendars on behalf of an existing team member through the
 team-scoped resource. The calendar payload identifies the member, and entries
 use timezone-aware, start-inclusive and end-exclusive intervals:
 
+Calendar imports use iCalendar (`.ics`) files containing `VEVENT` components;
+vCard (`.vcf`) files are contact records and are not availability imports.
+
 ```text
 GET    /teams/{team_id}/availability-calendars
 POST   /teams/{team_id}/availability-calendars
