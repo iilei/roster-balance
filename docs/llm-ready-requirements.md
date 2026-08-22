@@ -33,6 +33,7 @@ Present:
 - [x] owner-managed team-scoped availability calendars and availability entries
 - [x] minimal iCalendar VEVENT parsing with an explicit availability effect
 - [x] calendar source provenance and optional geographic/span metadata
+- [x] member-scoped calendar list/upsert/delete with self-or-owner authorization
 
 Gaps:
 
@@ -126,16 +127,16 @@ These are mandatory and non-negotiable:
 - [x] Calendar type uniqueness per team member is enforced in the application and database model.
 - [x] Member calendar uploads must accept iCalendar files with an explicit effect field such as blocked or available.
 - [x] The domain can parse iCalendar VEVENT entries with an explicit `available` or `unavailable` effect.
-- [ ] The initial source format should be icalendar and remain extensible.
-- [ ] Calendar records must use a globally unique ID regardless of scope.
-- [ ] Team membership, team ownership, and member calendar ownership are distinct concepts.
+- [x] The initial source format is iCalendar and remains extensible.
+- [x] Calendar records use globally unique IDs regardless of team/member scope.
+- [x] Team membership, team ownership, and member calendar ownership are distinct concepts.
 - [ ] The planner must resolve member, team, and instance calendars with explicit precedence and explain that precedence in the decision output.
 - [ ] Team owners may maintain team-scoped fallback calendars when instance-level calendars are missing or stale.
 - [ ] Work schedules and operating policies are distinct from imported holiday or availability calendars.
 - [ ] Default policies must be team-agnostic and keyed by policy identity rather than team names.
-- [ ] Time intervals must use start-inclusive, end-exclusive semantics.
-- [ ] Minute-level precision is the default expectation for planning and policy rules.
-- [ ] Exactly one calendar per calendar type per scope must be enforceable; duplicates must be rejected as a conflict.
+- [x] Time intervals use start-inclusive, end-exclusive semantics.
+- [x] Minute-level precision is supported for calendar entries and policy durations.
+- [x] Exactly one calendar per calendar type per team member is enforced in the application and database model.
 
 ## 5. API requirements
 
@@ -235,9 +236,17 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Add PostgreSQL-backed integration tests for migrations, ownership, uniqueness,
-and source imports. Follow that with calendar precedence in the decision
-context and the availability hard constraint.
+### Tracked next steps
+
+1. [ ] Add PostgreSQL-backed integration tests for migrations, ownership,
+   uniqueness, member-scoped access, and source imports.
+2. [ ] Add explicit source metadata response coverage and import replacement
+   semantics.
+3. [ ] Implement calendar precedence: instance → member → team fallback.
+4. [ ] Connect resolved availability entries to the availability hard
+   constraint and include precedence in decision explanations.
+5. [ ] Add work schedules and operating policies as separate configuration.
+6. [ ] Add versioned decision-policy resources and planning endpoints.
 
 ## 8. Agent guidance
 
