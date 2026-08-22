@@ -763,6 +763,182 @@
         }
       }
     },
+    "/teams/{team_id}/members/{member_id}/favorability": {
+      "get": {
+        "tags": [
+          "member-favorability"
+        ],
+        "summary": "List Member Favorability",
+        "operationId": "list_member_favorability_teams__team_id__members__member_id__favorability_get",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberFavorabilityResponse"
+                  },
+                  "title": "Response List Member Favorability Teams  Team Id  Members  Member Id  Favorability Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/members/{member_id}/favorability/{duty_role_id}": {
+      "post": {
+        "tags": [
+          "member-favorability"
+        ],
+        "summary": "Create Member Favorability",
+        "operationId": "create_member_favorability_teams__team_id__members__member_id__favorability__duty_role_id__post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          },
+          {
+            "name": "duty_role_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Duty Role Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberFavorabilityCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberFavorabilityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "member-favorability"
+        ],
+        "summary": "Delete Member Favorability",
+        "operationId": "delete_member_favorability_teams__team_id__members__member_id__favorability__duty_role_id__delete",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          },
+          {
+            "name": "duty_role_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Duty Role Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/teams/{team_id}/invitations": {
       "post": {
         "tags": [
@@ -1065,6 +1241,142 @@
           "user"
         ],
         "title": "MeResponse"
+      },
+      "MemberFavorabilityCreate": {
+        "properties": {
+          "effect": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Effect"
+          },
+          "blocking_level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocking Level"
+          },
+          "favorability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favorability"
+          },
+          "constraint_strength": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Constraint Strength"
+          }
+        },
+        "type": "object",
+        "required": [
+          "effect"
+        ],
+        "title": "MemberFavorabilityCreate"
+      },
+      "MemberFavorabilityResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "team_id": {
+            "type": "string",
+            "title": "Team Id"
+          },
+          "member_id": {
+            "type": "string",
+            "title": "Member Id"
+          },
+          "duty_role_id": {
+            "type": "string",
+            "title": "Duty Role Id"
+          },
+          "effect": {
+            "type": "string",
+            "title": "Effect"
+          },
+          "blocking_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocking Level"
+          },
+          "favorability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favorability"
+          },
+          "constraint_strength": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Constraint Strength"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "team_id",
+          "member_id",
+          "duty_role_id",
+          "effect",
+          "blocking_level",
+          "favorability",
+          "constraint_strength",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MemberFavorabilityResponse"
       },
       "TeamCreate": {
         "properties": {

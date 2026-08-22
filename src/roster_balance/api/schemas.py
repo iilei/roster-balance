@@ -93,6 +93,29 @@ class TeamEligibilityCreate(BaseModel):
     member_id: str = Field(min_length=1, max_length=200)
 
 
+class MemberFavorabilityCreate(BaseModel):
+    effect: str = Field(min_length=1, max_length=32)
+    blocking_level: str | None = Field(default=None, min_length=1, max_length=16)
+    favorability: float | None = None
+    constraint_strength: float | None = None
+
+
+class MemberFavorabilityResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    team_id: str
+    member_id: str
+    duty_role_id: str
+    effect: str
+    blocking_level: str | None
+    favorability: float | None
+    constraint_strength: float | None
+    source: str
+    created_at: datetime
+    updated_at: datetime
+
+
 class TeamInvitationCreate(BaseModel):
     email: str = Field(min_length=3, max_length=320)
 

@@ -122,6 +122,42 @@ class TeamEligibilityModel(Base):
     )
 
 
+class MemberFavorabilityModel(Base):
+    __tablename__ = 'member_favorability'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    team_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    member_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    duty_role_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('team_duty_roles.id', ondelete='CASCADE'), nullable=False
+    )
+    effect: Mapped[str] = mapped_column(String(32), nullable=False)
+    blocking_level: Mapped[str | None] = mapped_column(String(16))
+    favorability: Mapped[float | None] = mapped_column()
+    constraint_strength: Mapped[float | None] = mapped_column()
+    source: Mapped[str] = mapped_column(String(32), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['team_id', 'member_id'],
+            ['team_memberships.team_id', 'team_memberships.user_id'],
+            ondelete='CASCADE',
+        ),
+        UniqueConstraint(
+            'team_id',
+            'member_id',
+            'duty_role_id',
+            name='uq_member_favorability_member_role',
+        ),
+    )
+
+
 class TeamInvitationModel(Base):
     __tablename__ = 'team_invitations'
 
