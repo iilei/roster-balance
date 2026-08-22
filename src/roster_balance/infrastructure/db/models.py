@@ -75,13 +75,12 @@ class TeamMembershipModel(Base):
     )
 
 
-class TeamDutyRoleModel(Base):
-    __tablename__ = 'team_duty_roles'
+class DutyRoleModel(Base):
+    """Duty role catalog entry, independent of its team association."""
+
+    __tablename__ = 'duty_roles'
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    team_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey('teams.id', ondelete='CASCADE'), nullable=False
-    )
     slug: Mapped[str] = mapped_column(String(80), nullable=False)
     display_name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(String(2000))
@@ -93,8 +92,27 @@ class TeamDutyRoleModel(Base):
         DateTime(timezone=True), nullable=False
     )
 
+
+class TeamDutyRoleModel(Base):
+    """Relationship linking a duty role to the team that owns it."""
+
+    __tablename__ = 'team_duty_roles'
+
+    team_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('teams.id', ondelete='CASCADE'), primary_key=True
+    )
+    duty_role_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey('duty_roles.id', ondelete='CASCADE'),
+        primary_key=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
     __table_args__ = (
-        UniqueConstraint('team_id', 'slug', name='uq_team_duty_roles_team_slug'),
+        # a duty role currently belongs to exactly one team
+        UniqueConstraint('duty_role_id', name='uq_team_duty_roles_duty_role'),
     )
 
 
@@ -105,7 +123,7 @@ class TeamEligibilityModel(Base):
     member_id: Mapped[str] = mapped_column(String(255), primary_key=True)
     duty_role_id: Mapped[str] = mapped_column(
         String(36),
-        ForeignKey('team_duty_roles.id', ondelete='CASCADE'),
+        ForeignKey('duty_roles.id', ondelete='CASCADE'),
         primary_key=True,
     )
     duty_role: Mapped[str] = mapped_column(String(80), nullable=False)
@@ -129,7 +147,7 @@ class MemberFavorabilityModel(Base):
     team_id: Mapped[str] = mapped_column(String(36), nullable=False)
     member_id: Mapped[str] = mapped_column(String(255), nullable=False)
     duty_role_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey('team_duty_roles.id', ondelete='CASCADE'), nullable=False
+        String(36), ForeignKey('duty_roles.id', ondelete='CASCADE'), nullable=False
     )
     effect: Mapped[str] = mapped_column(String(32), nullable=False)
     blocking_level: Mapped[str | None] = mapped_column(String(16))

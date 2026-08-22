@@ -37,7 +37,7 @@ def upgrade() -> None:
             ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(
-            ['duty_role_id'], ['team_duty_roles.id'], ondelete='CASCADE'
+            ['duty_role_id'], ['duty_roles.id'], ondelete='CASCADE'
         ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(

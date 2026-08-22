@@ -7,6 +7,7 @@ from sqlalchemy import delete
 
 from roster_balance.api import dependencies
 from roster_balance.infrastructure.db.models import (
+    DutyRoleModel,
     TeamDutyRoleModel,
     TeamEligibilityModel,
     TeamInvitationModel,
@@ -24,6 +25,7 @@ def _clear_teams() -> None:
             TeamInvitationModel,
             TeamEligibilityModel,
             TeamDutyRoleModel,
+            DutyRoleModel,
             TeamMembershipModel,
             TeamModel,
         ):

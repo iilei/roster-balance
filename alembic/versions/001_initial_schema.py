@@ -63,18 +63,27 @@ def upgrade() -> None:
         ),
     )
     op.create_table(
-        'team_duty_roles',
+        'duty_roles',
         sa.Column('id', sa.String(length=36), nullable=False),
-        sa.Column('team_id', sa.String(length=36), nullable=False),
         sa.Column('slug', sa.String(length=80), nullable=False),
         sa.Column('display_name', sa.String(length=200), nullable=False),
         sa.Column('description', sa.String(length=2000), nullable=True),
         sa.Column('active', sa.Boolean(), nullable=False, server_default=sa.true()),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
-        sa.ForeignKeyConstraint(['team_id'], ['teams.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('team_id', 'slug', name='uq_team_duty_roles_team_slug'),
+    )
+    op.create_table(
+        'team_duty_roles',
+        sa.Column('team_id', sa.String(length=36), nullable=False),
+        sa.Column('duty_role_id', sa.String(length=36), nullable=False),
+        sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+        sa.ForeignKeyConstraint(['team_id'], ['teams.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(
+            ['duty_role_id'], ['duty_roles.id'], ondelete='CASCADE'
+        ),
+        sa.PrimaryKeyConstraint('team_id', 'duty_role_id'),
+        sa.UniqueConstraint('duty_role_id', name='uq_team_duty_roles_duty_role'),
     )
     op.create_table(
         'team_roster_eligibility',
@@ -89,7 +98,7 @@ def upgrade() -> None:
             ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(
-            ['duty_role_id'], ['team_duty_roles.id'], ondelete='CASCADE'
+            ['duty_role_id'], ['duty_roles.id'], ondelete='CASCADE'
         ),
         sa.PrimaryKeyConstraint('team_id', 'member_id', 'duty_role_id'),
     )
@@ -144,6 +153,7 @@ def downgrade() -> None:
     op.drop_table('team_invitations')
     op.drop_table('team_roster_eligibility')
     op.drop_table('team_duty_roles')
+    op.drop_table('duty_roles')
     op.drop_table('team_memberships')
     op.drop_index('ix_users_email', table_name='users')
     op.drop_table('users')
