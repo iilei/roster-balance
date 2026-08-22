@@ -160,6 +160,48 @@ class RosterLaneResponse(BaseModel):
     updated_at: datetime
 
 
+class AvailabilityCalendarCreate(BaseModel):
+    member_id: str = Field(min_length=1, max_length=255)
+    type: str = Field(min_length=1, max_length=32)
+    custom_type: str | None = Field(default=None, max_length=200)
+    name: str = Field(min_length=1, max_length=200)
+    timezone: str = Field(min_length=1, max_length=64)
+
+
+class AvailabilityCalendarResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    team_id: str
+    member_id: str
+    type: str
+    custom_type: str | None
+    name: str
+    timezone: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class AvailabilityEntryCreate(BaseModel):
+    starts_at: datetime
+    ends_at: datetime
+    availability: str = Field(min_length=1, max_length=32)
+    reason: str | None = Field(default=None, max_length=500)
+
+
+class AvailabilityEntryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    calendar_id: str
+    starts_at: datetime
+    ends_at: datetime
+    availability: str
+    reason: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
 class TeamEligibilityCreate(BaseModel):
     member_id: str = Field(min_length=1, max_length=200)
 

@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 
+from roster_balance.api.routes.availability_calendars import (
+    router as availability_calendars_router,
+)
 from roster_balance.api.routes.me import router as me_router
 from roster_balance.api.routes.member_favorability import (
     router as member_favorability_router,
@@ -19,6 +22,7 @@ app = FastAPI(
 )
 
 app.include_router(teams_router)
+app.include_router(availability_calendars_router)
 app.include_router(me_router)
 app.include_router(team_owners_router)
 app.include_router(team_eligibility_router)

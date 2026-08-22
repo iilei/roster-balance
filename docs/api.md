@@ -152,6 +152,20 @@ domain invariant visible at API level.
 
 ## Availability calendars
 
+Team owners can file calendars on behalf of an existing team member through the
+team-scoped resource. The calendar payload identifies the member, and entries
+use timezone-aware, start-inclusive and end-exclusive intervals:
+
+```text
+GET    /teams/{team_id}/availability-calendars
+POST   /teams/{team_id}/availability-calendars
+GET    /teams/{team_id}/availability-calendars/{calendar_id}
+DELETE /teams/{team_id}/availability-calendars/{calendar_id}
+GET    /teams/{team_id}/availability-calendars/{calendar_id}/entries
+POST   /teams/{team_id}/availability-calendars/{calendar_id}/entries
+DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
+```
+
 ```text
 GET    /availability-calendars
 POST   /availability-calendars

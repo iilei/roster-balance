@@ -3,6 +3,7 @@
 import os
 from datetime import timedelta
 
+from roster_balance.application.services.availability_service import AvailabilityService
 from roster_balance.application.services.member_favorability_service import (
     MemberFavorabilityService,
 )
@@ -25,6 +26,10 @@ from roster_balance.application.services.user_service import UserService
 from roster_balance.infrastructure.db.session import create_session_factory
 from roster_balance.infrastructure.email.mailto_invitation_sender import (
     MailtoInvitationSender,
+)
+from roster_balance.infrastructure.repositories.sqlalchemy_availability_repository import (
+    SQLAlchemyAvailabilityCalendarRepository,
+    SQLAlchemyAvailabilityEntryRepository,
 )
 from roster_balance.infrastructure.repositories.sqlalchemy_member_favorability_repository import (
     SQLAlchemyMemberFavorabilityRepository,
@@ -66,6 +71,11 @@ team_eligibility_service = TeamEligibilityService(
     SQLAlchemyTeamEligibilityRepository(session_factory),
     team_ownership_service,
     team_duty_role_service,
+)
+availability_service = AvailabilityService(
+    SQLAlchemyAvailabilityCalendarRepository(session_factory),
+    SQLAlchemyAvailabilityEntryRepository(session_factory),
+    team_ownership_service,
 )
 member_favorability_service = MemberFavorabilityService(
     SQLAlchemyMemberFavorabilityRepository(session_factory),
@@ -118,6 +128,10 @@ def get_team_ownership_service() -> TeamOwnershipService:
 
 def get_team_eligibility_service() -> TeamEligibilityService:
     return team_eligibility_service
+
+
+def get_availability_service() -> AvailabilityService:
+    return availability_service
 
 
 def get_team_duty_role_service() -> TeamDutyRoleService:

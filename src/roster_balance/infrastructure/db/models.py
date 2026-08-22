@@ -155,6 +155,59 @@ class RosterLaneModel(Base):
     )
 
 
+class AvailabilityCalendarModel(Base):
+    __tablename__ = 'availability_calendars'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    team_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('teams.id', ondelete='CASCADE'), nullable=False
+    )
+    member_id: Mapped[str] = mapped_column(
+        String(255), ForeignKey('users.id', ondelete='CASCADE'), nullable=False
+    )
+    type: Mapped[str] = mapped_column(String(32), nullable=False)
+    custom_type: Mapped[str | None] = mapped_column(String(200))
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'team_id', 'member_id', 'type', name='uq_availability_calendar_member_type'
+        ),
+    )
+
+
+class AvailabilityEntryModel(Base):
+    __tablename__ = 'availability_entries'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    calendar_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey('availability_calendars.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    availability: Mapped[str] = mapped_column(String(32), nullable=False)
+    reason: Mapped[str | None] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+    __table_args__ = (
+        Index('ix_availability_entries_calendar_starts', 'calendar_id', 'starts_at'),
+    )
+
+
 class TeamEligibilityModel(Base):
     __tablename__ = 'team_roster_eligibility'
 

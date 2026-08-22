@@ -30,6 +30,7 @@ Present:
 - [x] project tooling and local workflow configuration
 - [x] core design docs for architecture, domain model, API, and decision engine
 - [x] compact factoring-entity duration parsing with canonical integer-second normalization
+- [x] owner-managed team-scoped availability calendars and availability entries
 
 Gaps:
 
@@ -118,7 +119,9 @@ These are mandatory and non-negotiable:
 
 - [x] Factoring-entity duration input accepts strict `w`, `d`, `h`, and `m` tokens and normalizes to integer seconds.
 - [x] Factoring-entity duration limits are configurable through `MAX_FACTORING_ENTITY_DURATION_SECONDS` at the API boundary.
-- [ ] Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
+- [x] Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
+- [x] Calendar types and availability effects are validated at the application boundary.
+- [x] Calendar type uniqueness per team member is enforced in the application and database model.
 - [ ] Member calendar uploads must accept VCF files with an explicit effect field such as blocked or available.
 - [ ] The initial source format should be vcard and remain extensible.
 - [ ] Calendar records must use a globally unique ID regardless of scope.
@@ -169,6 +172,13 @@ Resource-oriented calendar endpoints:
 - [ ] GET /teams/{team_id}/calendars/{calendar_id}
 - [ ] PUT /teams/{team_id}/calendars/{calendar_id}
 - [ ] DELETE /teams/{team_id}/calendars/{calendar_id}
+- [x] POST /teams/{team_id}/availability-calendars
+- [x] GET /teams/{team_id}/availability-calendars
+- [x] GET /teams/{team_id}/availability-calendars/{calendar_id}
+- [x] DELETE /teams/{team_id}/availability-calendars/{calendar_id}
+- [x] GET /teams/{team_id}/availability-calendars/{calendar_id}/entries
+- [x] POST /teams/{team_id}/availability-calendars/{calendar_id}/entries
+- [x] DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 - [ ] POST /calendars
 - [ ] GET /calendars
 - [ ] GET /calendars/{calendar_id}
@@ -216,11 +226,10 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Complete the cooldown vertical slice by introducing a persisted `RestRule`
-entity, replacing the lane's inline cooldown with a `rest_rule_id`, and adding
-owner-authorized REST-rule CRUD. Then resolve the stored rule into the decision
-context and add PostgreSQL-backed integration tests. The existing duration
-parser and minimum-rest constraint provide the domain foundation for this work.
+Complete calendar management by adding PATCH operations, member-scoped calendar
+associations, VCF upload/import with explicit effects, and PostgreSQL-backed
+integration tests. Then implement calendar precedence in the decision context
+and connect availability entries to the existing hard-constraint pipeline.
 
 ## 8. Agent guidance
 
