@@ -14,8 +14,10 @@ from roster_balance.api.schemas import (
     AvailabilityEntryCreate,
     AvailabilityEntryPatch,
     AvailabilityEntryResponse,
+    MemberAvailabilityCalendarPut,
 )
 from roster_balance.application.services.availability_service import (
+    AvailabilityCalendarAccessError,
     AvailabilityCalendarConflictError,
     AvailabilityCalendarNotFoundError,
     AvailabilityEntryNotFoundError,
@@ -29,8 +31,78 @@ from roster_balance.domain.models.principal import Principal
 router = APIRouter(
     prefix='/teams/{team_id}/availability-calendars', tags=['availability-calendars']
 )
+member_router = APIRouter(
+    prefix='/teams/{team_id}/members/{member_id}/availability-calendars',
+    tags=['member-availability-calendars'],
+)
 Service = Annotated[AvailabilityService, Depends(get_availability_service)]
 PrincipalDependency = Annotated[Principal, Depends(get_principal)]
+
+
+@member_router.get('')
+def list_member_calendars(
+    team_id: str,
+    member_id: str,
+    service: Service,
+    principal: PrincipalDependency,
+) -> list[AvailabilityCalendarResponse]:
+    try:
+        return [
+            AvailabilityCalendarResponse.model_validate(item)
+            for item in service.list_member_calendars(team_id, member_id, principal)
+        ]
+    except (
+        AvailabilityCalendarAccessError,
+        AvailabilityCalendarNotFoundError,
+    ) as error:
+        raise HTTPException(status_code=404, detail='Calendar not found') from error
+
+
+@member_router.put('/{calendar_type}')
+def put_member_calendar(
+    team_id: str,
+    member_id: str,
+    calendar_type: str,
+    payload: MemberAvailabilityCalendarPut,
+    service: Service,
+    principal: PrincipalDependency,
+) -> AvailabilityCalendarResponse:
+    try:
+        return AvailabilityCalendarResponse.model_validate(
+            service.upsert_member_calendar(
+                team_id,
+                member_id,
+                calendar_type,
+                payload.custom_type,
+                payload.name,
+                payload.timezone,
+                principal,
+            )
+        )
+    except (
+        AvailabilityCalendarAccessError,
+        AvailabilityCalendarNotFoundError,
+    ) as error:
+        raise HTTPException(status_code=404, detail='Calendar not found') from error
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@member_router.delete('/{calendar_type}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_member_calendar(
+    team_id: str,
+    member_id: str,
+    calendar_type: str,
+    service: Service,
+    principal: PrincipalDependency,
+) -> None:
+    try:
+        service.delete_member_calendar(team_id, member_id, calendar_type, principal)
+    except (
+        AvailabilityCalendarAccessError,
+        AvailabilityCalendarNotFoundError,
+    ) as error:
+        raise HTTPException(status_code=404, detail='Calendar not found') from error
 
 
 @router.get('')

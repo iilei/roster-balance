@@ -168,6 +168,12 @@ class AvailabilityCalendarCreate(BaseModel):
     timezone: str = Field(min_length=1, max_length=64)
 
 
+class MemberAvailabilityCalendarPut(BaseModel):
+    custom_type: str | None = Field(default=None, max_length=200)
+    name: str = Field(min_length=1, max_length=200)
+    timezone: str = Field(min_length=1, max_length=64)
+
+
 class AvailabilityCalendarPatch(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     timezone: str = Field(min_length=1, max_length=64)

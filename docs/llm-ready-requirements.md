@@ -165,6 +165,9 @@ Rest-rule resources:
 
 Resource-oriented calendar endpoints:
 
+- [x] GET /teams/{team_id}/members/{member_id}/availability-calendars
+- [x] PUT /teams/{team_id}/members/{member_id}/availability-calendars/{calendar_type}
+- [x] DELETE /teams/{team_id}/members/{member_id}/availability-calendars/{calendar_type}
 - [ ] POST /members/{member_id}/availability-calendars
 - [ ] GET /members/{member_id}/availability-calendars
 - [ ] GET /members/{member_id}/availability-calendars/{calendar_id}
@@ -232,9 +235,9 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Add member-scoped calendar associations and PostgreSQL-backed integration tests.
-Follow that with calendar precedence in the decision context and the
-availability hard constraint.
+Add PostgreSQL-backed integration tests for migrations, ownership, uniqueness,
+and source imports. Follow that with calendar precedence in the decision
+context and the availability hard constraint.
 
 ## 8. Agent guidance
 

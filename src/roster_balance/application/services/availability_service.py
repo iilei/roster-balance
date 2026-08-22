@@ -37,6 +37,10 @@ class AvailabilityCalendarConflictError(ValueError):
     """Raised when a member already has a calendar of this type."""
 
 
+class AvailabilityCalendarAccessError(PermissionError):
+    """Raised when a principal cannot manage a member's calendar."""
+
+
 class AvailabilityService:
     def __init__(
         self,
@@ -110,6 +114,71 @@ class AvailabilityService:
                 updated_at=now,
             )
         )
+
+    def list_member_calendars(
+        self, team_id: str, member_id: str, principal: Principal
+    ) -> list[AvailabilityCalendar]:
+        self._authorize_member(team_id, member_id, principal)
+        return self._calendars.list_for_member(team_id, member_id)
+
+    def upsert_member_calendar(
+        self,
+        team_id: str,
+        member_id: str,
+        calendar_type: str,
+        custom_type: str | None,
+        name: str,
+        timezone: str,
+        principal: Principal,
+    ) -> AvailabilityCalendar:
+        self._authorize_member(team_id, member_id, principal)
+        existing = next(
+            (
+                calendar
+                for calendar in self._calendars.list_for_member(team_id, member_id)
+                if calendar.type == calendar_type.strip().casefold()
+            ),
+            None,
+        )
+        if existing is not None:
+            return self._calendars.save(
+                replace(
+                    existing,
+                    custom_type=custom_type.strip() if custom_type else None,
+                    name=name.strip(),
+                    timezone=timezone.strip(),
+                    updated_at=datetime.now(UTC),
+                )
+            )
+        return self.create_calendar(
+            team_id,
+            member_id,
+            calendar_type,
+            custom_type,
+            name,
+            timezone,
+            principal,
+        )
+
+    def delete_member_calendar(
+        self,
+        team_id: str,
+        member_id: str,
+        calendar_type: str,
+        principal: Principal,
+    ) -> None:
+        self._authorize_member(team_id, member_id, principal)
+        calendar = next(
+            (
+                item
+                for item in self._calendars.list_for_member(team_id, member_id)
+                if item.type == calendar_type.strip().casefold()
+            ),
+            None,
+        )
+        if calendar is None:
+            raise AvailabilityCalendarNotFoundError(calendar_type)
+        self._calendars.delete(calendar.id)
 
     def update_calendar(
         self,
@@ -261,3 +330,13 @@ class AvailabilityService:
     def _authorize(self, team_id: str, principal: Principal) -> None:
         if not self._ownership.is_owner(team_id, principal.user_id):
             raise OwnershipAuthorizationError(principal.user_id)
+
+    def _authorize_member(
+        self, team_id: str, member_id: str, principal: Principal
+    ) -> None:
+        if not self._ownership.is_member(team_id, member_id):
+            raise AvailabilityCalendarNotFoundError(member_id)
+        if principal.user_id != member_id and not self._ownership.is_owner(
+            team_id, principal.user_id
+        ):
+            raise AvailabilityCalendarAccessError(principal.user_id)

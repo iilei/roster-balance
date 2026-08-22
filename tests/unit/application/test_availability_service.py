@@ -92,6 +92,23 @@ def test_non_owner_cannot_manage_calendars() -> None:
         service.list_calendars('team', Principal('local', 'member'))
 
 
+def test_member_can_list_and_owner_can_upsert_member_calendar() -> None:
+    service = make_service()
+    owner = Principal('local', 'owner')
+    member = Principal('local', 'member')
+
+    created = service.upsert_member_calendar(
+        'team', 'local:member', 'vacation', None, 'Vacation', 'UTC', owner
+    )
+
+    assert service.list_member_calendars('team', 'local:member', member) == [created]
+    updated = service.upsert_member_calendar(
+        'team', 'local:member', 'VACATION', None, 'Updated', 'UTC', member
+    )
+    assert updated.id == created.id
+    assert updated.name == 'Updated'
+
+
 def test_entry_requires_positive_timezone_aware_interval() -> None:
     service = make_service()
     owner = Principal('local', 'owner')

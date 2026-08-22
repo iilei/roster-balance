@@ -39,6 +39,18 @@ class SQLAlchemyAvailabilityCalendarRepository:
             row = session.get(AvailabilityCalendarModel, calendar_id)
             return None if row is None else self._to_domain(row)
 
+    def list_for_member(
+        self, team_id: str, member_id: str
+    ) -> builtins.list[AvailabilityCalendar]:
+        with self._session_factory.begin() as session:
+            rows = session.scalars(
+                select(AvailabilityCalendarModel).where(
+                    AvailabilityCalendarModel.team_id == team_id,
+                    AvailabilityCalendarModel.member_id == member_id,
+                )
+            ).all()
+            return [self._to_domain(row) for row in rows]
+
     def add(self, calendar: AvailabilityCalendar) -> AvailabilityCalendar:
         with self._session_factory.begin() as session:
             row = AvailabilityCalendarModel(

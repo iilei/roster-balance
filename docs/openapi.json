@@ -773,6 +773,182 @@
         }
       }
     },
+    "/teams/{team_id}/members/{member_id}/availability-calendars": {
+      "get": {
+        "tags": [
+          "member-availability-calendars"
+        ],
+        "summary": "List Member Calendars",
+        "operationId": "list_member_calendars_teams__team_id__members__member_id__availability_calendars_get",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AvailabilityCalendarResponse"
+                  },
+                  "title": "Response List Member Calendars Teams  Team Id  Members  Member Id  Availability Calendars Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/members/{member_id}/availability-calendars/{calendar_type}": {
+      "put": {
+        "tags": [
+          "member-availability-calendars"
+        ],
+        "summary": "Put Member Calendar",
+        "operationId": "put_member_calendar_teams__team_id__members__member_id__availability_calendars__calendar_type__put",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          },
+          {
+            "name": "calendar_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Calendar Type"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberAvailabilityCalendarPut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityCalendarResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "member-availability-calendars"
+        ],
+        "summary": "Delete Member Calendar",
+        "operationId": "delete_member_calendar_teams__team_id__members__member_id__availability_calendars__calendar_type__delete",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Member Id"
+            }
+          },
+          {
+            "name": "calendar_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Calendar Type"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/me": {
       "get": {
         "tags": [
@@ -2616,6 +2792,40 @@
           "user"
         ],
         "title": "MeResponse"
+      },
+      "MemberAvailabilityCalendarPut": {
+        "properties": {
+          "custom_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Type"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Timezone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "timezone"
+        ],
+        "title": "MemberAvailabilityCalendarPut"
       },
       "MemberFavorabilityCreate": {
         "properties": {

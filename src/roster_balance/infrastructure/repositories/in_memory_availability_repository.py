@@ -21,6 +21,15 @@ class InMemoryAvailabilityCalendarRepository:
     def get(self, calendar_id: str) -> AvailabilityCalendar | None:
         return self._calendars.get(calendar_id)
 
+    def list_for_member(
+        self, team_id: str, member_id: str
+    ) -> list[AvailabilityCalendar]:
+        return [
+            item
+            for item in self._calendars.values()
+            if item.team_id == team_id and item.member_id == member_id
+        ]
+
     def add(self, calendar: AvailabilityCalendar) -> AvailabilityCalendar:
         self._calendars[calendar.id] = calendar
         return calendar

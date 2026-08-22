@@ -141,6 +141,15 @@ GET    /members/{member_id}/teams
 
 ## Member availability calendars
 
+Within a team context, members can read and manage their own calendars, and
+team owners can manage the same resources on their behalf:
+
+```text
+GET    /teams/{team_id}/members/{member_id}/availability-calendars
+PUT    /teams/{team_id}/members/{member_id}/availability-calendars/{calendar_type}
+DELETE /teams/{team_id}/members/{member_id}/availability-calendars/{calendar_type}
+```
+
 ```text
 GET    /members/{member_id}/availability-calendars
 PUT    /members/{member_id}/availability-calendars/{calendar_type}
