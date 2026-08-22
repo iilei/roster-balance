@@ -62,7 +62,7 @@ extend-ignore = [
 # Pydantic resolves schema field types from the module namespace.
 "**/schemas.py" = ["TC003"]
 "**/models.py" = ["TC003"]
-
+"**/proquint*" = ["PLR2004"]
 
 [tool.ruff]
 line-length = 88
