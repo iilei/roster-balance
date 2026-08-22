@@ -15,6 +15,7 @@ from roster_balance.domain.models.availability import (
     AvailabilityCalendar,
     AvailabilityEntry,
 )
+from roster_balance.domain.vcard import parse_icalendar_entries
 
 if TYPE_CHECKING:
     from roster_balance.domain.models.principal import Principal
@@ -142,6 +143,8 @@ class AvailabilityService:
         if starts_at.tzinfo is None or ends_at.tzinfo is None:
             raise ValueError('availability intervals must be timezone-aware')
         normalized = availability.strip().casefold()
+        if normalized == 'blocked':
+            normalized = 'unavailable'
         if normalized not in {'available', 'unavailable'}:
             raise ValueError('availability must be available or unavailable')
         now = datetime.now(UTC)
@@ -157,6 +160,23 @@ class AvailabilityService:
                 now,
             )
         )
+
+    def add_icalendar_source(
+        self,
+        team_id: str,
+        calendar_id: str,
+        content: bytes,
+        effect: str,
+        source_format: str,
+        principal: Principal,
+    ) -> list[AvailabilityEntry]:
+        self.get_calendar(team_id, calendar_id, principal)
+        if source_format.strip().casefold() != 'icalendar':
+            raise ValueError('source_format must be icalendar')
+        entries = parse_icalendar_entries(
+            content, calendar_id=calendar_id, effect=effect
+        )
+        return self._entries.add_many(entries)
 
     def delete_calendar(
         self, team_id: str, calendar_id: str, principal: Principal
@@ -193,6 +213,8 @@ class AvailabilityService:
         if starts_at.tzinfo is None or ends_at.tzinfo is None:
             raise ValueError('availability intervals must be timezone-aware')
         normalized = availability.strip().casefold()
+        if normalized == 'blocked':
+            normalized = 'unavailable'
         if normalized not in {'available', 'unavailable'}:
             raise ValueError('availability must be available or unavailable')
         return self._entries.save(

@@ -123,7 +123,7 @@ These are mandatory and non-negotiable:
 - [x] Resource-oriented calendar URLs are required; action names such as import must not appear in the route path.
 - [x] Calendar types and availability effects are validated at the application boundary.
 - [x] Calendar type uniqueness per team member is enforced in the application and database model.
-- [ ] Member calendar uploads must accept iCalendar files with an explicit effect field such as blocked or available.
+- [x] Member calendar uploads must accept iCalendar files with an explicit effect field such as blocked or available.
 - [x] The domain can parse iCalendar VEVENT entries with an explicit `available` or `unavailable` effect.
 - [ ] The initial source format should be icalendar and remain extensible.
 - [ ] Calendar records must use a globally unique ID regardless of scope.
@@ -183,6 +183,7 @@ Resource-oriented calendar endpoints:
 - [x] POST /teams/{team_id}/availability-calendars/{calendar_id}/entries
 - [x] PATCH /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 - [x] DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
+- [x] POST /teams/{team_id}/availability-calendars/{calendar_id}/sources
 - [ ] POST /calendars
 - [ ] GET /calendars
 - [ ] GET /calendars/{calendar_id}
@@ -230,11 +231,9 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Wire the iCalendar parser into the owner-managed calendar API using a multipart
-upload with an explicit effect and `source_format=icalendar`, then persist the parsed
-entries transactionally. Follow that with member-scoped calendar associations,
-PostgreSQL-backed integration tests, calendar precedence in the decision
-context, and the availability hard constraint.
+Add member-scoped calendar associations and calendar source metadata, then add
+PostgreSQL-backed integration tests. Follow that with calendar precedence in
+the decision context and the availability hard constraint.
 
 ## 8. Agent guidance
 

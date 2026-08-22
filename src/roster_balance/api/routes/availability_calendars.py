@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from roster_balance.api.auth import get_principal
 from roster_balance.api.dependencies import get_availability_service
@@ -149,6 +149,35 @@ def add_entry(
                 principal,
             )
         )
+    except (OwnershipAuthorizationError, AvailabilityCalendarNotFoundError) as error:
+        raise HTTPException(status_code=404, detail='Calendar not found') from error
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.post('/{calendar_id}/sources', status_code=status.HTTP_201_CREATED)
+async def add_source(
+    team_id: str,
+    calendar_id: str,
+    file: Annotated[UploadFile, File(...)],
+    effect: Annotated[str, Form(...)],
+    source_format: Annotated[str, Form(...)],
+    service: Service,
+    principal: PrincipalDependency,
+) -> list[AvailabilityEntryResponse]:
+    try:
+        entries = await file.read()
+        return [
+            AvailabilityEntryResponse.model_validate(item)
+            for item in service.add_icalendar_source(
+                team_id,
+                calendar_id,
+                entries,
+                effect,
+                source_format,
+                principal,
+            )
+        ]
     except (OwnershipAuthorizationError, AvailabilityCalendarNotFoundError) as error:
         raise HTTPException(status_code=404, detail='Calendar not found') from error
     except ValueError as error:

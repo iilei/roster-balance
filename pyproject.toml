@@ -16,6 +16,7 @@ dependencies = [
     "psycopg[binary]>=3.2,<4",
     "mangum>=0.19,<1",
     "vobject>=0.9.9,<1",
+    "python-multipart>=0.0.20,<1",
 ]
 
 [project.optional-dependencies]

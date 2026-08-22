@@ -587,6 +587,71 @@
         }
       }
     },
+    "/teams/{team_id}/availability-calendars/{calendar_id}/sources": {
+      "post": {
+        "tags": [
+          "availability-calendars"
+        ],
+        "summary": "Add Source",
+        "operationId": "add_source_teams__team_id__availability_calendars__calendar_id__sources_post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "calendar_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Calendar Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_source_teams__team_id__availability_calendars__calendar_id__sources_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AvailabilityEntryResponse"
+                  },
+                  "title": "Response Add Source Teams  Team Id  Availability Calendars  Calendar Id  Sources Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}": {
       "patch": {
         "tags": [
@@ -2313,6 +2378,30 @@
           "updated_at"
         ],
         "title": "AvailabilityEntryResponse"
+      },
+      "Body_add_source_teams__team_id__availability_calendars__calendar_id__sources_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "effect": {
+            "type": "string",
+            "title": "Effect"
+          },
+          "source_format": {
+            "type": "string",
+            "title": "Source Format"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "effect",
+          "source_format"
+        ],
+        "title": "Body_add_source_teams__team_id__availability_calendars__calendar_id__sources_post"
       },
       "HTTPValidationError": {
         "properties": {

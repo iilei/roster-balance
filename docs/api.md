@@ -167,9 +167,14 @@ PATCH  /teams/{team_id}/availability-calendars/{calendar_id}
 DELETE /teams/{team_id}/availability-calendars/{calendar_id}
 GET    /teams/{team_id}/availability-calendars/{calendar_id}/entries
 POST   /teams/{team_id}/availability-calendars/{calendar_id}/entries
+POST   /teams/{team_id}/availability-calendars/{calendar_id}/sources
 PATCH  /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 ```
+
+The `sources` endpoint accepts a multipart iCalendar (`.ics`) file with the
+`effect` (`available` or `unavailable`) and `source_format=icalendar` form
+fields. Parsed entries are stored as one transaction.
 
 ```text
 GET    /availability-calendars

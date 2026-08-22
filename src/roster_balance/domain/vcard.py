@@ -23,6 +23,8 @@ def parse_icalendar_entries(
 ) -> list[AvailabilityEntry]:
     """Parse vobject VEVENT components with an explicit availability effect."""
     normalized_effect = effect.strip().casefold()
+    if normalized_effect == 'blocked':
+        normalized_effect = 'unavailable'
     if normalized_effect not in {'available', 'unavailable'}:
         raise ICalendarParseError('effect must be available or unavailable')
     try:
@@ -49,7 +51,7 @@ def parse_icalendar_entries(
             ends_at = _as_datetime(event.dtend.value)
         except (AttributeError, TypeError, ValueError) as error:
             raise ICalendarParseError(
-                'VEVENT requires valid DTSTART and DTEND'
+                'VEVENT requires valid DTSTART and DTEND values'
             ) from error
         if ends_at <= starts_at:
             raise ICalendarParseError('VEVENT DTEND must be after DTSTART')

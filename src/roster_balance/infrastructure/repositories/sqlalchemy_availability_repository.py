@@ -125,6 +125,25 @@ class SQLAlchemyAvailabilityEntryRepository:
             session.flush()
             return self._to_domain(row)
 
+    def add_many(self, entries: list[AvailabilityEntry]) -> list[AvailabilityEntry]:
+        with self._session_factory.begin() as session:
+            rows = [
+                AvailabilityEntryModel(
+                    id=entry.id,
+                    calendar_id=entry.calendar_id,
+                    starts_at=entry.starts_at,
+                    ends_at=entry.ends_at,
+                    availability=entry.availability,
+                    reason=entry.reason,
+                    created_at=entry.created_at,
+                    updated_at=entry.updated_at,
+                )
+                for entry in entries
+            ]
+            session.add_all(rows)
+            session.flush()
+            return [self._to_domain(row) for row in rows]
+
     def save(self, entry: AvailabilityEntry) -> AvailabilityEntry:
         with self._session_factory.begin() as session:
             row = session.get(AvailabilityEntryModel, entry.id)

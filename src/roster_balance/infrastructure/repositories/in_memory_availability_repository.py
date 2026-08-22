@@ -49,6 +49,11 @@ class InMemoryAvailabilityEntryRepository:
         self._entries[entry.id] = entry
         return entry
 
+    def add_many(self, entries: list[AvailabilityEntry]) -> list[AvailabilityEntry]:
+        for entry in entries:
+            self.add(entry)
+        return entries
+
     def save(self, entry: AvailabilityEntry) -> AvailabilityEntry:
         self._entries[entry.id] = entry
         return entry

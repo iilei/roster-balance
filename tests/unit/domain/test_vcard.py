@@ -11,7 +11,7 @@ from roster_balance.domain.vcard import (
 def test_parse_vcard_entries_requires_explicit_effect() -> None:
     with pytest.raises(ICalendarParseError, match='effect must be'):
         parse_icalendar_entries(
-            'BEGIN:VCALENDAR\nEND:VCALENDAR', calendar_id='cal', effect='blocked'
+            'BEGIN:VCALENDAR\nEND:VCALENDAR', calendar_id='cal', effect='unknown'
         )
 
 

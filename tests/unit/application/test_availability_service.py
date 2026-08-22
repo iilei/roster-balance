@@ -111,6 +111,69 @@ def test_entry_requires_positive_timezone_aware_interval() -> None:
         )
 
 
+def test_owner_can_add_icalendar_source_entries() -> None:
+    service = make_service()
+    owner = Principal('local', 'owner')
+    calendar = service.create_calendar(
+        'team', 'local:member', 'vacation', None, 'Vacation', 'UTC', owner
+    )
+
+    entries = service.add_icalendar_source(
+        'team',
+        calendar.id,
+        (
+            b'BEGIN:VCALENDAR\n'
+            b'BEGIN:VEVENT\n'
+            b'DTSTART:20260901T090000Z\n'
+            b'DTEND:20260901T170000Z\n'
+            b'SUMMARY:Conference\n'
+            b'END:VEVENT\n'
+            b'END:VCALENDAR\n'
+        ),
+        'unavailable',
+        'icalendar',
+        owner,
+    )
+
+    assert len(entries) == 1
+    assert entries[0].availability == 'unavailable'
+    assert entries[0].reason == 'Conference'
+    assert service.list_entries('team', calendar.id, owner) == entries
+
+
+def test_icalendar_source_requires_icalendar_format() -> None:
+    service = make_service()
+    owner = Principal('local', 'owner')
+    calendar = service.create_calendar(
+        'team', 'local:member', 'vacation', None, 'Vacation', 'UTC', owner
+    )
+
+    with pytest.raises(ValueError, match='source_format must be icalendar'):
+        service.add_icalendar_source(
+            'team', calendar.id, b'', 'available', 'vcard', owner
+        )
+
+
+def test_blocked_effect_is_normalized_to_unavailable() -> None:
+    service = make_service()
+    owner = Principal('local', 'owner')
+    calendar = service.create_calendar(
+        'team', 'local:member', 'vacation', None, 'Vacation', 'UTC', owner
+    )
+
+    entry = service.add_entry(
+        'team',
+        calendar.id,
+        datetime(2026, 9, 1, tzinfo=UTC),
+        datetime(2026, 9, 2, tzinfo=UTC),
+        'blocked',
+        None,
+        owner,
+    )
+
+    assert entry.availability == 'unavailable'
+
+
 def test_owner_can_update_calendar_metadata_and_entry() -> None:
     service = make_service()
     owner = Principal('local', 'owner')
