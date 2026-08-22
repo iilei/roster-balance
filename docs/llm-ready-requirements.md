@@ -218,6 +218,42 @@ The payload contract for file-based calendar import must support the following f
 - Team-related service skeletons
 - FastAPI app bootstrap and health endpoint
 - Tooling and local dev commands
+
+### Near-term implementation priorities
+
+For the next milestone, the implementation should prioritize the following in order:
+
+1. Team ownership and membership flows
+   - complete team CRUD with owner-only authorization checks
+   - enforce duplicate-name validation and explicit membership records
+   - keep membership and eligibility as distinct relations
+
+2. Explicit roster eligibility APIs
+   - add the eligible-members resource model and update behavior
+   - ensure planning and scoring only consider explicitly eligible members
+   - preserve team membership and roster participation as separate concepts
+
+3. Invitation lifecycle and onboarding
+   - complete owner-authenticated invitation creation and acceptance flow
+   - use single-use tokens, expiration, audit metadata, and generic responses
+   - ensure acceptance grants membership but not implicit roster eligibility
+
+4. Explainable decision engine
+   - finish hard constraints, scoring, and deterministic ordering semantics
+   - return ranked candidates, rejections, and contributing factors in output
+   - keep policy configuration declarative and versioned without executable expressions
+
+5. Calendar and scheduling foundations
+   - implement resource-oriented calendar endpoints and VCF imports
+   - enforce explicit calendar precedence and per-scope uniqueness rules
+   - keep work schedules separate from imported holiday calendars
+
+6. Persistence and verification
+   - implement the required PostgreSQL persistence layer with Alembic migrations
+   - add targeted integration and unit tests for each domain boundary
+   - verify the app remains explainable and decoupled from infrastructure concerns
+
+This milestone should produce a working, testable baseline for team membership, eligibility, invitation onboarding, and explainable roster planning without conflating authorization with roster assignment authority.
 - Decision-engine conceptual design
 
 ### In progress
