@@ -9,6 +9,7 @@ from roster_balance.domain.models.team_ownership import TeamOwnership
 
 if TYPE_CHECKING:
     from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.models.team_ownership import TeamMemberRole
     from roster_balance.domain.repositories.team_ownership_repository import (
         TeamOwnershipRepository,
     )
@@ -43,6 +44,18 @@ class TeamOwnershipService:
 
     def list_members(self, team_id: str) -> list[TeamOwnership]:
         return self._repository.list_for_team(team_id)
+
+    def list_for_user(
+        self, user_id: str, role: TeamMemberRole | None = None
+    ) -> list[TeamOwnership]:
+        return self._repository.list_for_user(user_id, role)
+
+    def is_member(self, team_id: str, user_id: str) -> bool:
+        return self._repository.get(team_id, user_id) is not None
+
+    def require_member(self, team_id: str, user_id: str) -> None:
+        if not self.is_member(team_id, user_id):
+            raise OwnershipAuthorizationError(user_id)
 
     def is_owner(self, team_id: str, user_id: str) -> bool:
         membership = self._repository.get(team_id, user_id)

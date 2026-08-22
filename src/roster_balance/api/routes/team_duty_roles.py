@@ -5,7 +5,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from roster_balance.api.auth import get_principal
-from roster_balance.api.dependencies import get_team_duty_role_service
+from roster_balance.api.dependencies import (
+    get_team_duty_role_service,
+    get_team_ownership_service,
+)
 from roster_balance.api.schemas import TeamDutyRoleCreate, TeamDutyRoleResponse
 from roster_balance.application.services.team_duty_role_service import (
     DutyRoleConflictError,
@@ -14,16 +17,27 @@ from roster_balance.application.services.team_duty_role_service import (
 )
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
+    TeamOwnershipService,
 )
 from roster_balance.domain.models.principal import Principal
 
 router = APIRouter(prefix='/teams/{team_id}/duty-roles', tags=['duty-roles'])
 DutyRoles = Annotated[TeamDutyRoleService, Depends(get_team_duty_role_service)]
+Ownership = Annotated[TeamOwnershipService, Depends(get_team_ownership_service)]
 PrincipalDependency = Annotated[Principal, Depends(get_principal)]
 
 
 @router.get('')
-def list_roles(team_id: str, service: DutyRoles) -> list[TeamDutyRoleResponse]:
+def list_roles(
+    team_id: str,
+    service: DutyRoles,
+    ownership: Ownership,
+    principal: PrincipalDependency,
+) -> list[TeamDutyRoleResponse]:
+    try:
+        ownership.require_member(team_id, principal.user_id)
+    except OwnershipAuthorizationError as error:
+        raise HTTPException(status_code=404, detail='Team not found') from error
     return [
         TeamDutyRoleResponse.model_validate(role)
         for role in service.list_roles(team_id)

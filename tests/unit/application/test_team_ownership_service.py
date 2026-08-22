@@ -44,3 +44,13 @@ def test_last_owner_cannot_be_removed() -> None:
 
     with pytest.raises(LastOwnerError):
         service.remove_owner('team', 'local:alice', Principal('local', 'alice'))
+
+
+def test_require_member_rejects_users_outside_the_team() -> None:
+    repository = InMemoryTeamOwnershipRepository()
+    repository.add(TeamOwnership('team', 'local:alice', 'member', datetime.now(UTC)))
+    service = TeamOwnershipService(repository)
+
+    service.require_member('team', 'local:alice')
+    with pytest.raises(OwnershipAuthorizationError):
+        service.require_member('team', 'local:bob')

@@ -5,7 +5,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from roster_balance.api.auth import get_principal
-from roster_balance.api.dependencies import get_team_eligibility_service
+from roster_balance.api.dependencies import (
+    get_team_eligibility_service,
+    get_team_ownership_service,
+)
 from roster_balance.api.schemas import TeamEligibilityCreate, TeamEligibilityResponse
 from roster_balance.application.services.team_duty_role_service import (
     DutyRoleNotFoundError,
@@ -19,6 +22,7 @@ from roster_balance.application.services.team_eligibility_service import (
 )
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
+    TeamOwnershipService,
 )
 from roster_balance.domain.models.principal import Principal
 
@@ -27,11 +31,21 @@ router = APIRouter(
     tags=['eligible-members'],
 )
 Eligibility = Annotated[TeamEligibilityService, Depends(get_team_eligibility_service)]
+Ownership = Annotated[TeamOwnershipService, Depends(get_team_ownership_service)]
 PrincipalDependency = Annotated[Principal, Depends(get_principal)]
 
 
 @router.get('')
-def list_eligible(team_id: str, service: Eligibility) -> list[TeamEligibilityResponse]:
+def list_eligible(
+    team_id: str,
+    service: Eligibility,
+    ownership: Ownership,
+    principal: PrincipalDependency,
+) -> list[TeamEligibilityResponse]:
+    try:
+        ownership.require_member(team_id, principal.user_id)
+    except OwnershipAuthorizationError as error:
+        raise HTTPException(status_code=404, detail='Team not found') from error
     return [
         TeamEligibilityResponse.model_validate(member)
         for member in service.list_eligible(team_id)
@@ -40,13 +54,20 @@ def list_eligible(team_id: str, service: Eligibility) -> list[TeamEligibilityRes
 
 @router.get('/{duty_role}')
 def list_role_eligible(
-    team_id: str, duty_role: str, service: Eligibility
+    team_id: str,
+    duty_role: str,
+    service: Eligibility,
+    ownership: Ownership,
+    principal: PrincipalDependency,
 ) -> list[TeamEligibilityResponse]:
     try:
+        ownership.require_member(team_id, principal.user_id)
         return [
             TeamEligibilityResponse.model_validate(member)
             for member in service.list_eligible(team_id, duty_role)
         ]
+    except OwnershipAuthorizationError as error:
+        raise HTTPException(status_code=404, detail='Team not found') from error
     except DutyRoleNotFoundError as error:
         raise HTTPException(status_code=404, detail='Duty role not found') from error
 

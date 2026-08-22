@@ -30,6 +30,20 @@ class SQLAlchemyTeamOwnershipRepository:
             ).all()
             return [self._to_domain(row) for row in rows]
 
+    def list_for_user(
+        self, user_id: str, role: str | None = None
+    ) -> builtins.list[TeamOwnership]:
+        with self._session_factory.begin() as session:
+            statement = select(TeamMembershipModel).where(
+                TeamMembershipModel.user_id == user_id
+            )
+            if role is not None:
+                statement = statement.where(TeamMembershipModel.role == role)
+            rows = session.scalars(
+                statement.order_by(TeamMembershipModel.created_at)
+            ).all()
+            return [self._to_domain(row) for row in rows]
+
     def get(self, team_id: str, user_id: str) -> TeamOwnership | None:
         with self._session_factory.begin() as session:
             row = session.get(TeamMembershipModel, (team_id, user_id))

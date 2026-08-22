@@ -17,14 +17,20 @@ from roster_balance.domain.models.principal import Principal
 
 router = APIRouter(prefix='/teams/{team_id}/team-members', tags=['team-members'])
 Ownership = Annotated[TeamOwnershipService, Depends(get_team_ownership_service)]
+PrincipalDependency = Annotated[Principal, Depends(get_principal)]
 
 
 @router.get('')
 def list_team_members(
     team_id: str,
     service: Ownership,
+    principal: PrincipalDependency,
     role: Annotated[Literal['owner'] | None, Query()] = None,
 ) -> list[TeamOwnerResponse]:
+    try:
+        service.require_member(team_id, principal.user_id)
+    except OwnershipAuthorizationError as error:
+        raise HTTPException(status_code=404, detail='Team not found') from error
     members = (
         service.list_owners(team_id)
         if role == 'owner'

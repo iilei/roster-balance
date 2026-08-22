@@ -28,6 +28,11 @@ class TeamResponse(BaseModel):
     updated_at: datetime
 
 
+class TeamMembershipResponse(BaseModel):
+    team: TeamResponse
+    role: Literal['owner', 'member']
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -51,7 +56,7 @@ class TeamOwnerResponse(BaseModel):
 
     team_id: str
     user_id: str
-    role: Literal['owner'] = 'owner'
+    role: Literal['owner', 'member']
     created_at: datetime
 
 

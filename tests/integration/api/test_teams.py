@@ -1,8 +1,14 @@
+from uuid import uuid4
+
 from fastapi.testclient import TestClient
 
 from roster_balance.main import app
 
 client = TestClient(app)
+
+
+def team_name(prefix: str) -> str:
+    return f'{prefix} {uuid4()}'
 
 
 def test_team_crud_is_exposed_in_openapi_and_http() -> None:
@@ -11,6 +17,7 @@ def test_team_crud_is_exposed_in_openapi_and_http() -> None:
     assert '/teams/{team_id}' in schema['paths']
     assert '/teams/{team_id}/team-members' in schema['paths']
     assert '/teams/{team_id}/eligible-members' in schema['paths']
+    assert '/me/teams' in schema['paths']
     assert 'put' not in schema['paths']['/teams/{team_id}/team-members']
     assert 'delete' in schema['paths']['/teams/{team_id}/team-members/{user_id}']
 
@@ -40,9 +47,10 @@ def test_team_crud_is_exposed_in_openapi_and_http() -> None:
 
 
 def test_duplicate_team_names_are_rejected() -> None:
-    first = client.post('/teams', json={'name': 'Unique team'})
+    name = team_name('Unique team')
+    first = client.post('/teams', json={'name': name})
     assert first.status_code == 201
-    duplicate = client.post('/teams', json={'name': 'UNIQUE TEAM'})
+    duplicate = client.post('/teams', json={'name': name.upper()})
     assert duplicate.status_code == 409
 
 
@@ -66,7 +74,7 @@ def test_teams_can_be_searched_by_name_or_description() -> None:
 
 
 def test_team_creator_is_added_as_owner() -> None:
-    created = client.post('/teams', json={'name': 'Owned team'})
+    created = client.post('/teams', json={'name': team_name('Owned team')})
     assert created.status_code == 201
 
     owners = client.get(
@@ -78,8 +86,23 @@ def test_team_creator_is_added_as_owner() -> None:
     assert owners.json()[0]['role'] == 'owner'
 
 
+def test_my_teams_includes_membership_role_and_owner_filter() -> None:
+    owned = client.post('/teams', json={'name': team_name('My owned team')})
+    assert owned.status_code == 201
+
+    response = client.get('/me/teams')
+    assert response.status_code == 200
+    teams = response.json()
+    matching = next(item for item in teams if item['team']['id'] == owned.json()['id'])
+    assert matching['role'] == 'owner'
+
+    owners = client.get('/me/teams', params={'role': 'owner'})
+    assert owners.status_code == 200
+    assert all(item['role'] == 'owner' for item in owners.json())
+
+
 def test_team_membership_does_not_make_a_member_roster_eligible() -> None:
-    created = client.post('/teams', json={'name': 'Eligibility team'})
+    created = client.post('/teams', json={'name': team_name('Eligibility team')})
     team_id = created.json()['id']
 
     members = client.get(f'/teams/{team_id}/team-members')
@@ -120,7 +143,7 @@ def test_owner_can_submit_generic_team_invitation() -> None:
     assert '/teams/{team_id}/invitations' in schema['paths']
     assert '/invitations/{invitation_id}/accept' in schema['paths']
 
-    created = client.post('/teams', json={'name': 'Invitation team'})
+    created = client.post('/teams', json={'name': team_name('Invitation team')})
     invitation = client.post(
         f'/teams/{created.json()["id"]}/invitations',
         json={'email': 'Alice@Example.com'},

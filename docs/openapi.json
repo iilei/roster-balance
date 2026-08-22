@@ -246,6 +246,63 @@
         }
       }
     },
+    "/me/teams": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "summary": "List My Teams",
+        "operationId": "list_my_teams_me_teams_get",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "owner",
+                    "member"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamMembershipResponse"
+                  },
+                  "title": "Response List My Teams Me Teams Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/teams/{team_id}/team-members": {
       "get": {
         "tags": [
@@ -1267,6 +1324,27 @@
         ],
         "title": "TeamInvitationSubmissionResponse"
       },
+      "TeamMembershipResponse": {
+        "properties": {
+          "team": {
+            "$ref": "#/components/schemas/TeamResponse"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "member"
+            ],
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "team",
+          "role"
+        ],
+        "title": "TeamMembershipResponse"
+      },
       "TeamOwnerResponse": {
         "properties": {
           "team_id": {
@@ -1279,9 +1357,11 @@
           },
           "role": {
             "type": "string",
-            "const": "owner",
-            "title": "Role",
-            "default": "owner"
+            "enum": [
+              "owner",
+              "member"
+            ],
+            "title": "Role"
           },
           "created_at": {
             "type": "string",
@@ -1293,6 +1373,7 @@
         "required": [
           "team_id",
           "user_id",
+          "role",
           "created_at"
         ],
         "title": "TeamOwnerResponse"

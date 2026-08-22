@@ -22,6 +22,7 @@ Service = Annotated[TeamService, Depends(get_team_service)]
 
 @router.get('')
 def list_teams(
+    _principal: Annotated[Principal, Depends(get_principal)],
     service: Service,
     q: Annotated[str | None, Query(min_length=1, max_length=200)] = None,
 ) -> list[TeamResponse]:
@@ -47,18 +48,33 @@ def create_team(
 
 
 @router.get('/{team_id}')
-def get_team(team_id: str, service: Service) -> TeamResponse:
+def get_team(
+    team_id: str,
+    service: Service,
+    principal: Annotated[Principal, Depends(get_principal)],
+) -> TeamResponse:
     try:
-        return TeamResponse.model_validate(service.get_team(team_id))
+        return TeamResponse.model_validate(
+            service.get_team_for_member(team_id, principal.user_id),
+        )
     except TeamNotFoundError as error:
         raise HTTPException(status_code=404, detail='Team not found') from error
 
 
 @router.patch('/{team_id}')
-def update_team(team_id: str, payload: TeamPatch, service: Service) -> TeamResponse:
+def update_team(
+    team_id: str,
+    payload: TeamPatch,
+    service: Service,
+    principal: Annotated[Principal, Depends(get_principal)],
+) -> TeamResponse:
     try:
         return TeamResponse.model_validate(
-            service.update_team(team_id, **payload.model_dump(exclude_unset=True)),
+            service.update_team_for_owner(
+                team_id,
+                principal.user_id,
+                **payload.model_dump(exclude_unset=True),
+            ),
         )
     except TeamNotFoundError as error:
         raise HTTPException(status_code=404, detail='Team not found') from error
@@ -67,12 +83,25 @@ def update_team(team_id: str, payload: TeamPatch, service: Service) -> TeamRespo
             status_code=409,
             detail='A team with this name already exists',
         ) from error
+    except PermissionError as error:
+        raise HTTPException(
+            status_code=403,
+            detail='Team owner access required',
+        ) from error
 
 
 @router.delete('/{team_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_team(team_id: str, service: Service) -> Response:
+def delete_team(
+    team_id: str,
+    service: Service,
+    principal: Annotated[Principal, Depends(get_principal)],
+) -> Response:
     try:
-        service.delete_team(team_id)
+        service.delete_team_for_owner(team_id, principal.user_id)
     except TeamNotFoundError as error:
         raise HTTPException(status_code=404, detail='Team not found') from error
+    except PermissionError as error:
+        raise HTTPException(
+            status_code=403, detail='Team owner access required'
+        ) from error
     return Response(status_code=status.HTTP_204_NO_CONTENT)

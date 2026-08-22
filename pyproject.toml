@@ -85,8 +85,11 @@ dev = [
     "mypy",
 ]
 
-[tool.hatch.envs.hatch-test]
+[tool.hatch.envs.default]
 features = ["dev"]
+
+[tool.hatch.envs.default.scripts]
+typecheck = "mypy src tests"
 
 [tool.hatch.envs.docs.scripts]
 openapi = "python -m roster_balance.generate_openapi"

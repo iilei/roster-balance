@@ -19,6 +19,15 @@ class InMemoryTeamOwnershipRepository:
             if relation.team_id == team_id
         ]
 
+    def list_for_user(
+        self, user_id: str, role: str | None = None
+    ) -> list[TeamOwnership]:
+        return [
+            relation
+            for relation in self._ownership.values()
+            if relation.user_id == user_id and (role is None or relation.role == role)
+        ]
+
     def get(self, team_id: str, user_id: str) -> TeamOwnership | None:
         return self._ownership.get((team_id, user_id))
 

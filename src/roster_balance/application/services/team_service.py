@@ -15,6 +15,10 @@ if TYPE_CHECKING:
     )
     from roster_balance.application.services.user_service import UserService
     from roster_balance.domain.models.principal import Principal
+    from roster_balance.domain.models.team_ownership import (
+        TeamMemberRole,
+        TeamOwnership,
+    )
     from roster_balance.domain.repositories.team_repository import TeamRepository
 
 _UNSET = object()
@@ -43,10 +47,52 @@ class TeamService:
         self._ownership_service = ownership_service
 
     def list_teams(self) -> list[Team]:
-        return self._repository.list()
+        return [team for team in self._repository.list() if team.active]
 
     def search_teams(self, query: str) -> list[Team]:
-        return self._repository.search(query)
+        return [team for team in self._repository.search(query) if team.active]
+
+    def list_teams_for_user(
+        self, user_id: str, role: TeamMemberRole | None = None
+    ) -> list[tuple[Team, TeamOwnership]]:
+        if self._ownership_service is None:
+            raise RuntimeError('team ownership service is not configured')
+        memberships = self._ownership_service.list_for_user(user_id, role)
+        teams = []
+        for membership in memberships:
+            team = self._repository.get(membership.team_id)
+            if team is not None and team.active:
+                teams.append((team, membership))
+        return teams
+
+    def get_team_for_member(self, team_id: str, user_id: str) -> Team:
+        team = self.get_team(team_id)
+        if self._ownership_service is None or not self._ownership_service.is_member(
+            team_id, user_id
+        ):
+            raise TeamNotFoundError(team_id)
+        return team
+
+    def update_team_for_owner(
+        self,
+        team_id: str,
+        user_id: str,
+        *,
+        name: str | None = None,
+        description: str | object | None = _UNSET,
+        active: bool | None = None,
+    ) -> Team:
+        self._require_owner(team_id, user_id)
+        return self.update_team(
+            team_id,
+            name=name,
+            description=description,
+            active=active,
+        )
+
+    def delete_team_for_owner(self, team_id: str, user_id: str) -> None:
+        self._require_owner(team_id, user_id)
+        self.delete_team(team_id)
 
     def get_team(self, team_id: str) -> Team:
         team = self._repository.get(team_id)
@@ -103,3 +149,10 @@ class TeamService:
     def delete_team(self, team_id: str) -> None:
         self.get_team(team_id)
         self._repository.delete(team_id)
+
+    def _require_owner(self, team_id: str, user_id: str) -> None:
+        self.get_team(team_id)
+        if self._ownership_service is None or not self._ownership_service.is_owner(
+            team_id, user_id
+        ):
+            raise PermissionError(team_id)

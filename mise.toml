@@ -7,7 +7,7 @@ run = ["hatch check code --fix", "hatch check fmt --fix"]
 
 [tasks.typecheck]
 description = "Run mypy against the project"
-run = "mypy src tests"
+run = "hatch run typecheck"
 
 [tasks.lint]
 description = "Run static type and lint checks"
@@ -23,7 +23,7 @@ run = [
 
 [tasks.test]
 description = "Run the test suite with Hatch"
-run = "hatch test"
+run = "hatch run pytest -q"
 
 [tasks.openapi]
 description = "Start the local OpenAPI server with Docker Compose"
