@@ -2,7 +2,7 @@
 
 Before implementing a task:
 
-1. Read `.github/copilot-instructions.md`.
+1. Read `.github/skills/python-quality/copilot-instructions.md`.
 2. Read the relevant files in `docs/`.
 3. Keep domain, application and infrastructure layers separate.
 4. Add or update tests for all domain behavior.
