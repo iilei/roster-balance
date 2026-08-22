@@ -1,5 +1,6 @@
 """Owner-managed team availability calendar API routes."""
 
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -164,6 +165,11 @@ async def add_source(
     source_format: Annotated[str, Form(...)],
     service: Service,
     principal: PrincipalDependency,
+    country: Annotated[str | None, Form()] = None,
+    state: Annotated[str | None, Form()] = None,
+    county: Annotated[str | None, Form()] = None,
+    span_from: Annotated[datetime | None, Form()] = None,
+    span_to: Annotated[datetime | None, Form()] = None,
 ) -> list[AvailabilityEntryResponse]:
     try:
         entries = await file.read()
@@ -175,6 +181,12 @@ async def add_source(
                 entries,
                 effect,
                 source_format,
+                file.filename,
+                country,
+                state,
+                county,
+                span_from,
+                span_to,
                 principal,
             )
         ]

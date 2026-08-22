@@ -91,15 +91,23 @@ class AvailabilityService:
         now = datetime.now(UTC)
         return self._calendars.add(
             AvailabilityCalendar(
-                str(uuid4()),
-                team_id,
-                member_id,
-                normalized_type,
-                custom_type.strip() if custom_type else None,
-                name.strip(),
-                timezone.strip(),
-                now,
-                now,
+                id=str(uuid4()),
+                team_id=team_id,
+                member_id=member_id,
+                type=normalized_type,
+                custom_type=custom_type.strip() if custom_type else None,
+                name=name.strip(),
+                timezone=timezone.strip(),
+                source_format=None,
+                source_filename=None,
+                imported_at=None,
+                country=None,
+                state=None,
+                county=None,
+                span_from=None,
+                span_to=None,
+                created_at=now,
+                updated_at=now,
             )
         )
 
@@ -168,6 +176,12 @@ class AvailabilityService:
         content: bytes,
         effect: str,
         source_format: str,
+        source_filename: str | None,
+        country: str | None,
+        state: str | None,
+        county: str | None,
+        span_from: datetime | None,
+        span_to: datetime | None,
         principal: Principal,
     ) -> list[AvailabilityEntry]:
         self.get_calendar(team_id, calendar_id, principal)
@@ -175,6 +189,22 @@ class AvailabilityService:
             raise ValueError('source_format must be icalendar')
         entries = parse_icalendar_entries(
             content, calendar_id=calendar_id, effect=effect
+        )
+        calendar = self.get_calendar(team_id, calendar_id, principal)
+        imported_at = datetime.now(UTC)
+        self._calendars.save(
+            replace(
+                calendar,
+                source_format='icalendar',
+                source_filename=source_filename,
+                imported_at=imported_at,
+                country=country.strip() if country else None,
+                state=state.strip() if state else None,
+                county=county.strip() if county else None,
+                span_from=span_from,
+                span_to=span_to,
+                updated_at=imported_at,
+            )
         )
         return self._entries.add_many(entries)
 

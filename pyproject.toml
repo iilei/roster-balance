@@ -60,8 +60,8 @@ extend-ignore = [
     'SLF001',  # Private member accessed
     "PLR2004"
 ]
-# FastAPI resolves Annotated dependency types at route registration time.
-"**/api/routes/*.py" = ["TC001"]
+# FastAPI resolves Annotated dependency and form types at route registration time.
+"**/api/routes/*.py" = ["TC001", "TC003"]
 # Pydantic resolves schema field types from the module namespace.
 "**/schemas.py" = ["TC003"]
 "**/models.py" = ["TC003"]

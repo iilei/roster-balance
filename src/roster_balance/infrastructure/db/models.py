@@ -169,6 +169,14 @@ class AvailabilityCalendarModel(Base):
     custom_type: Mapped[str | None] = mapped_column(String(200))
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     timezone: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_format: Mapped[str | None] = mapped_column(String(32))
+    source_filename: Mapped[str | None] = mapped_column(String(255))
+    imported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    country: Mapped[str | None] = mapped_column(String(100))
+    state: Mapped[str | None] = mapped_column(String(100))
+    county: Mapped[str | None] = mapped_column(String(100))
+    span_from: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    span_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )

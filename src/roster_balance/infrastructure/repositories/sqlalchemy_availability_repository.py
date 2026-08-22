@@ -49,6 +49,14 @@ class SQLAlchemyAvailabilityCalendarRepository:
                 custom_type=calendar.custom_type,
                 name=calendar.name,
                 timezone=calendar.timezone,
+                source_format=calendar.source_format,
+                source_filename=calendar.source_filename,
+                imported_at=calendar.imported_at,
+                country=calendar.country,
+                state=calendar.state,
+                county=calendar.county,
+                span_from=calendar.span_from,
+                span_to=calendar.span_to,
                 created_at=calendar.created_at,
                 updated_at=calendar.updated_at,
             )
@@ -72,6 +80,14 @@ class SQLAlchemyAvailabilityCalendarRepository:
             row.name = calendar.name
             row.timezone = calendar.timezone
             row.custom_type = calendar.custom_type
+            row.source_format = calendar.source_format
+            row.source_filename = calendar.source_filename
+            row.imported_at = calendar.imported_at
+            row.country = calendar.country
+            row.state = calendar.state
+            row.county = calendar.county
+            row.span_from = calendar.span_from
+            row.span_to = calendar.span_to
             row.updated_at = calendar.updated_at
             session.flush()
             return self._to_domain(row)
@@ -79,15 +95,23 @@ class SQLAlchemyAvailabilityCalendarRepository:
     @staticmethod
     def _to_domain(row: AvailabilityCalendarModel) -> AvailabilityCalendar:
         return AvailabilityCalendar(
-            row.id,
-            row.team_id,
-            row.member_id,
-            row.type,
-            row.custom_type,
-            row.name,
-            row.timezone,
-            row.created_at,
-            row.updated_at,
+            id=row.id,
+            team_id=row.team_id,
+            member_id=row.member_id,
+            type=row.type,
+            custom_type=row.custom_type,
+            name=row.name,
+            timezone=row.timezone,
+            source_format=row.source_format,
+            source_filename=row.source_filename,
+            imported_at=row.imported_at,
+            country=row.country,
+            state=row.state,
+            county=row.county,
+            span_from=row.span_from,
+            span_to=row.span_to,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
         )
 
 

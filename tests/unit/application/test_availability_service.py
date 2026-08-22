@@ -132,6 +132,12 @@ def test_owner_can_add_icalendar_source_entries() -> None:
         ),
         'unavailable',
         'icalendar',
+        'availability.ics',
+        None,
+        None,
+        None,
+        None,
+        None,
         owner,
     )
 
@@ -150,7 +156,18 @@ def test_icalendar_source_requires_icalendar_format() -> None:
 
     with pytest.raises(ValueError, match='source_format must be icalendar'):
         service.add_icalendar_source(
-            'team', calendar.id, b'', 'available', 'vcard', owner
+            'team',
+            calendar.id,
+            b'',
+            'available',
+            'vcard',
+            'availability.vcf',
+            None,
+            None,
+            None,
+            None,
+            None,
+            owner,
         )
 
 

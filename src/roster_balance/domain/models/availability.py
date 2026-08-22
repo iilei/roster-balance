@@ -18,6 +18,14 @@ class AvailabilityCalendar:
     custom_type: str | None
     name: str
     timezone: str
+    source_format: str | None
+    source_filename: str | None
+    imported_at: datetime | None
+    country: str | None
+    state: str | None
+    county: str | None
+    span_from: datetime | None
+    span_to: datetime | None
     created_at: datetime
     updated_at: datetime
 

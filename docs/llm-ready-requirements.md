@@ -32,6 +32,7 @@ Present:
 - [x] compact factoring-entity duration parsing with canonical integer-second normalization
 - [x] owner-managed team-scoped availability calendars and availability entries
 - [x] minimal iCalendar VEVENT parsing with an explicit availability effect
+- [x] calendar source provenance and optional geographic/span metadata
 
 Gaps:
 
@@ -196,13 +197,13 @@ Resource-oriented calendar endpoints:
 
 Calendar import payloads must support:
 
-- [ ] name
-- [ ] type
-- [ ] custom_type when applicable
-- [ ] effect
-- [ ] source_format
-- [ ] file
-- [ ] optional metadata such as country, state, county, and span_from/span_to
+- [x] name
+- [x] type
+- [x] custom_type when applicable
+- [x] effect
+- [x] source_format
+- [x] file
+- [x] optional metadata such as country, state, county, and span_from/span_to
 
 ## 6. Implementation priorities
 
@@ -231,9 +232,9 @@ The next milestone is complete only when:
 
 ## 9. Suggested next step
 
-Add member-scoped calendar associations and calendar source metadata, then add
-PostgreSQL-backed integration tests. Follow that with calendar precedence in
-the decision context and the availability hard constraint.
+Add member-scoped calendar associations and PostgreSQL-backed integration tests.
+Follow that with calendar precedence in the decision context and the
+availability hard constraint.
 
 ## 8. Agent guidance
 
