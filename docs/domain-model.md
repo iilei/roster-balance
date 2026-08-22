@@ -182,11 +182,19 @@ RosterLane
 - id
 - team_id
 - name
+- duration
+- cooldown_after
 - active
-- optional metadata
+- created_at
+- updated_at
 ```
 
-A lane describes a staffing dimension, not the scoring policy itself.
+A lane describes a staffing obligation, not the scoring policy itself. Its
+`duration` is the length of an assignment and `cooldown_after` is the recovery
+period required for the assigned member before another assignment may begin.
+The cooldown is measured from the previous assignment's `ends_at` and uses a
+start-inclusive, end-exclusive boundary: a candidate is eligible at exactly
+`previous.ends_at + cooldown_after`.
 
 ## Roster
 

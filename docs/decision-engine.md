@@ -40,6 +40,17 @@ Examples:
 - insufficient rest after on-call
 - member not eligible for the lane
 
+The minimum-rest constraint compares a candidate period's start with each
+matching member's latest prior assignment:
+
+```text
+previous_assignment.ends_at + previous_assignment.cooldown_after
+  <= candidate_period.starts_at
+```
+
+The comparison is inclusive at the boundary. A failed result should identify
+the prior assignment end and the earliest eligible time.
+
 ### Metric
 
 Measures something without deciding.

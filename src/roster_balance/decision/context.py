@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    from datetime import datetime, timedelta
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,8 +24,17 @@ class AssignmentCandidate:
 
 
 @dataclass(frozen=True, slots=True)
+class AssignmentEvent:
+    member_id: str
+    lane_id: str
+    starts_at: datetime
+    ends_at: datetime
+    cooldown_after: timedelta
+
+
+@dataclass(frozen=True, slots=True)
 class DecisionContext:
     periods: tuple[PlanningPeriod, ...]
-    historical_events: tuple[object, ...] = ()
-    committed_events: tuple[object, ...] = ()
-    suggested_events: tuple[object, ...] = ()
+    historical_events: tuple[AssignmentEvent, ...] = ()
+    committed_events: tuple[AssignmentEvent, ...] = ()
+    suggested_events: tuple[AssignmentEvent, ...] = ()
