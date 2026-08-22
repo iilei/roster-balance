@@ -134,6 +134,27 @@ class RestRuleModel(Base):
     )
 
 
+class RosterLaneModel(Base):
+    __tablename__ = 'roster_lanes'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    team_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('teams.id', ondelete='CASCADE'), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    duration: Mapped[int] = mapped_column(nullable=False)
+    rest_rule_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey('rest_rules.id', ondelete='RESTRICT'), nullable=False
+    )
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+
 class TeamEligibilityModel(Base):
     __tablename__ = 'team_roster_eligibility'
 

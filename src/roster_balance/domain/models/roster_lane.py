@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from datetime import datetime, timedelta
+    from datetime import datetime
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,8 +14,8 @@ class RosterLane:
     id: str
     team_id: str
     name: str
-    duration: timedelta
-    cooldown_after: timedelta
+    duration: int
+    rest_rule_id: str
     active: bool
     created_at: datetime
     updated_at: datetime

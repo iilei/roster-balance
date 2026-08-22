@@ -168,12 +168,14 @@ DELETE /availability-calendars/{calendar_id}/entries/{entry_id}
 ## Roster lanes
 
 ```text
-GET    /roster-lanes
-POST   /roster-lanes
-GET    /roster-lanes/{lane_id}
-PATCH  /roster-lanes/{lane_id}
-DELETE /roster-lanes/{lane_id}
+GET    /teams/{team_id}/roster-lanes
+POST   /teams/{team_id}/roster-lanes
+GET    /teams/{team_id}/roster-lanes/{lane_id}
+DELETE /teams/{team_id}/roster-lanes/{lane_id}
 ```
+
+Lane creation accepts a compact duration string and a same-team `rest_rule_id`.
+The stored and returned duration is integer seconds.
 
 ## Rosters
 

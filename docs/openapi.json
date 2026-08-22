@@ -1128,6 +1128,195 @@
         }
       }
     },
+    "/teams/{team_id}/roster-lanes": {
+      "get": {
+        "tags": [
+          "roster-lanes"
+        ],
+        "summary": "List Lanes",
+        "operationId": "list_lanes_teams__team_id__roster_lanes_get",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RosterLaneResponse"
+                  },
+                  "title": "Response List Lanes Teams  Team Id  Roster Lanes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "roster-lanes"
+        ],
+        "summary": "Create Lane",
+        "operationId": "create_lane_teams__team_id__roster_lanes_post",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RosterLaneCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterLaneResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/teams/{team_id}/roster-lanes/{lane_id}": {
+      "get": {
+        "tags": [
+          "roster-lanes"
+        ],
+        "summary": "Get Lane",
+        "operationId": "get_lane_teams__team_id__roster_lanes__lane_id__get",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "lane_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lane Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterLaneResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "roster-lanes"
+        ],
+        "summary": "Deactivate Lane",
+        "operationId": "deactivate_lane_teams__team_id__roster_lanes__lane_id__delete",
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Team Id"
+            }
+          },
+          {
+            "name": "lane_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lane Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/teams/{team_id}/invitations": {
       "post": {
         "tags": [
@@ -1631,6 +1820,83 @@
           "updated_at"
         ],
         "title": "RestRuleResponse"
+      },
+      "RosterLaneCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "duration": {
+            "type": "integer",
+            "title": "Duration"
+          },
+          "rest_rule_id": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Rest Rule Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "duration",
+          "rest_rule_id"
+        ],
+        "title": "RosterLaneCreate"
+      },
+      "RosterLaneResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "team_id": {
+            "type": "string",
+            "title": "Team Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "duration": {
+            "type": "integer",
+            "title": "Duration"
+          },
+          "rest_rule_id": {
+            "type": "string",
+            "title": "Rest Rule Id"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "team_id",
+          "name",
+          "duration",
+          "rest_rule_id",
+          "active",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "RosterLaneResponse"
       },
       "TeamCreate": {
         "properties": {

@@ -197,7 +197,7 @@ The next milestone should prioritize these in order:
 2. [x] Explicit roster eligibility APIs
 3. [x] Invitation lifecycle and onboarding
 4. [x] Explainable decision engine
-5. [ ] Rest rules and roster-lane configuration
+5. [x] Rest rules and roster-lane configuration
 6. [ ] Calendar and scheduling foundations
 7. [ ] Persistence and verification
 

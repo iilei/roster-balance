@@ -182,8 +182,8 @@ RosterLane
 - id
 - team_id
 - name
-- duration
-- cooldown_after
+- duration (integer seconds)
+- rest_rule_id
 - active
 - created_at
 - updated_at

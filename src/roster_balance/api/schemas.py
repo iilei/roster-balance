@@ -127,6 +127,39 @@ class RestRuleResponse(BaseModel):
     updated_at: datetime
 
 
+class RosterLaneCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    duration: int
+    rest_rule_id: str = Field(min_length=1, max_length=36)
+
+    @field_validator('duration', mode='before')
+    @classmethod
+    def parse_duration_value(cls, value: object) -> int:
+        max_seconds = _max_factoring_entity_duration_seconds()
+        if isinstance(value, int):
+            seconds = value
+        else:
+            seconds = parse_duration(value, max_seconds=max_seconds)
+        if seconds <= 0:
+            raise ValueError('duration must be greater than zero')
+        if seconds > max_seconds:
+            raise ValueError('duration exceeds the configured maximum')
+        return seconds
+
+
+class RosterLaneResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    team_id: str
+    name: str
+    duration: int
+    rest_rule_id: str
+    active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
 class TeamEligibilityCreate(BaseModel):
     member_id: str = Field(min_length=1, max_length=200)
 

@@ -7,6 +7,7 @@ from roster_balance.application.services.member_favorability_service import (
     MemberFavorabilityService,
 )
 from roster_balance.application.services.rest_rule_service import RestRuleService
+from roster_balance.application.services.roster_lane_service import RosterLaneService
 from roster_balance.application.services.team_duty_role_service import (
     TeamDutyRoleService,
 )
@@ -30,6 +31,9 @@ from roster_balance.infrastructure.repositories.sqlalchemy_member_favorability_r
 )
 from roster_balance.infrastructure.repositories.sqlalchemy_rest_rule_repository import (
     SQLAlchemyRestRuleRepository,
+)
+from roster_balance.infrastructure.repositories.sqlalchemy_roster_lane_repository import (
+    SQLAlchemyRosterLaneRepository,
 )
 from roster_balance.infrastructure.repositories.sqlalchemy_team_duty_role_repository import (
     SQLAlchemyTeamDutyRoleRepository,
@@ -70,6 +74,11 @@ member_favorability_service = MemberFavorabilityService(
 )
 rest_rule_service = RestRuleService(
     SQLAlchemyRestRuleRepository(session_factory), team_ownership_service
+)
+roster_lane_service = RosterLaneService(
+    SQLAlchemyRosterLaneRepository(session_factory),
+    team_ownership_service,
+    rest_rule_service,
 )
 mailto_invitation_sender = MailtoInvitationSender(
     os.getenv('INVITATION_BASE_URL', 'http://localhost:8000')
@@ -121,6 +130,10 @@ def get_member_favorability_service() -> MemberFavorabilityService:
 
 def get_rest_rule_service() -> RestRuleService:
     return rest_rule_service
+
+
+def get_roster_lane_service() -> RosterLaneService:
+    return roster_lane_service
 
 
 def get_team_invitation_service() -> TeamInvitationService:
