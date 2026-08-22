@@ -160,9 +160,11 @@ use timezone-aware, start-inclusive and end-exclusive intervals:
 GET    /teams/{team_id}/availability-calendars
 POST   /teams/{team_id}/availability-calendars
 GET    /teams/{team_id}/availability-calendars/{calendar_id}
+PATCH  /teams/{team_id}/availability-calendars/{calendar_id}
 DELETE /teams/{team_id}/availability-calendars/{calendar_id}
 GET    /teams/{team_id}/availability-calendars/{calendar_id}/entries
 POST   /teams/{team_id}/availability-calendars/{calendar_id}/entries
+PATCH  /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 ```
 

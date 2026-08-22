@@ -175,9 +175,11 @@ Resource-oriented calendar endpoints:
 - [x] POST /teams/{team_id}/availability-calendars
 - [x] GET /teams/{team_id}/availability-calendars
 - [x] GET /teams/{team_id}/availability-calendars/{calendar_id}
+- [x] PATCH /teams/{team_id}/availability-calendars/{calendar_id}
 - [x] DELETE /teams/{team_id}/availability-calendars/{calendar_id}
 - [x] GET /teams/{team_id}/availability-calendars/{calendar_id}/entries
 - [x] POST /teams/{team_id}/availability-calendars/{calendar_id}/entries
+- [x] PATCH /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 - [x] DELETE /teams/{team_id}/availability-calendars/{calendar_id}/entries/{entry_id}
 - [ ] POST /calendars
 - [ ] GET /calendars

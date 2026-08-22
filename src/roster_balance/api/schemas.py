@@ -168,6 +168,11 @@ class AvailabilityCalendarCreate(BaseModel):
     timezone: str = Field(min_length=1, max_length=64)
 
 
+class AvailabilityCalendarPatch(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    timezone: str = Field(min_length=1, max_length=64)
+
+
 class AvailabilityCalendarResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -187,6 +192,10 @@ class AvailabilityEntryCreate(BaseModel):
     ends_at: datetime
     availability: str = Field(min_length=1, max_length=32)
     reason: str | None = Field(default=None, max_length=500)
+
+
+class AvailabilityEntryPatch(AvailabilityEntryCreate):
+    pass
 
 
 class AvailabilityEntryResponse(BaseModel):

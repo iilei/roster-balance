@@ -25,6 +25,10 @@ class InMemoryAvailabilityCalendarRepository:
         self._calendars[calendar.id] = calendar
         return calendar
 
+    def save(self, calendar: AvailabilityCalendar) -> AvailabilityCalendar:
+        self._calendars[calendar.id] = calendar
+        return calendar
+
     def delete(self, calendar_id: str) -> None:
         self._calendars.pop(calendar_id, None)
 

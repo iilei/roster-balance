@@ -64,6 +64,18 @@ class SQLAlchemyAvailabilityCalendarRepository:
                 )
             )
 
+    def save(self, calendar: AvailabilityCalendar) -> AvailabilityCalendar:
+        with self._session_factory.begin() as session:
+            row = session.get(AvailabilityCalendarModel, calendar.id)
+            if row is None:
+                raise LookupError(calendar.id)
+            row.name = calendar.name
+            row.timezone = calendar.timezone
+            row.custom_type = calendar.custom_type
+            row.updated_at = calendar.updated_at
+            session.flush()
+            return self._to_domain(row)
+
     @staticmethod
     def _to_domain(row: AvailabilityCalendarModel) -> AvailabilityCalendar:
         return AvailabilityCalendar(

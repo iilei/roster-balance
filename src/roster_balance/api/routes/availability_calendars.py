@@ -8,8 +8,10 @@ from roster_balance.api.auth import get_principal
 from roster_balance.api.dependencies import get_availability_service
 from roster_balance.api.schemas import (
     AvailabilityCalendarCreate,
+    AvailabilityCalendarPatch,
     AvailabilityCalendarResponse,
     AvailabilityEntryCreate,
+    AvailabilityEntryPatch,
     AvailabilityEntryResponse,
 )
 from roster_balance.application.services.availability_service import (
@@ -86,6 +88,24 @@ def get_calendar(
         raise HTTPException(status_code=404, detail='Calendar not found') from error
 
 
+@router.patch('/{calendar_id}')
+def update_calendar(
+    team_id: str,
+    calendar_id: str,
+    payload: AvailabilityCalendarPatch,
+    service: Service,
+    principal: PrincipalDependency,
+) -> AvailabilityCalendarResponse:
+    try:
+        return AvailabilityCalendarResponse.model_validate(
+            service.update_calendar(
+                team_id, calendar_id, payload.name, payload.timezone, principal
+            )
+        )
+    except (OwnershipAuthorizationError, AvailabilityCalendarNotFoundError) as error:
+        raise HTTPException(status_code=404, detail='Calendar not found') from error
+
+
 @router.delete('/{calendar_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_calendar(
     team_id: str, calendar_id: str, service: Service, principal: PrincipalDependency
@@ -131,6 +151,38 @@ def add_entry(
         )
     except (OwnershipAuthorizationError, AvailabilityCalendarNotFoundError) as error:
         raise HTTPException(status_code=404, detail='Calendar not found') from error
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.patch('/{calendar_id}/entries/{entry_id}')
+def update_entry(
+    team_id: str,
+    calendar_id: str,
+    entry_id: str,
+    payload: AvailabilityEntryPatch,
+    service: Service,
+    principal: PrincipalDependency,
+) -> AvailabilityEntryResponse:
+    try:
+        return AvailabilityEntryResponse.model_validate(
+            service.update_entry(
+                team_id,
+                calendar_id,
+                entry_id,
+                payload.starts_at,
+                payload.ends_at,
+                payload.availability,
+                payload.reason,
+                principal,
+            )
+        )
+    except (
+        OwnershipAuthorizationError,
+        AvailabilityCalendarNotFoundError,
+        AvailabilityEntryNotFoundError,
+    ) as error:
+        raise HTTPException(status_code=404, detail='Entry not found') from error
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 

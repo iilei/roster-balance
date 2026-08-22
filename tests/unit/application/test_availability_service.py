@@ -109,3 +109,41 @@ def test_entry_requires_positive_timezone_aware_interval() -> None:
             None,
             owner,
         )
+
+
+def test_owner_can_update_calendar_metadata_and_entry() -> None:
+    service = make_service()
+    owner = Principal('local', 'owner')
+    calendar = service.create_calendar(
+        'team', 'local:member', 'vacation', None, 'Vacation', 'UTC', owner
+    )
+    entry = service.add_entry(
+        'team',
+        calendar.id,
+        datetime(2026, 9, 1, tzinfo=UTC),
+        datetime(2026, 9, 2, tzinfo=UTC),
+        'unavailable',
+        'Holiday',
+        owner,
+    )
+
+    updated_calendar = service.update_calendar(
+        'team', calendar.id, 'Updated vacation', 'Europe/Amsterdam', owner
+    )
+    updated_entry = service.update_entry(
+        'team',
+        calendar.id,
+        entry.id,
+        datetime(2026, 9, 3, tzinfo=UTC),
+        datetime(2026, 9, 4, tzinfo=UTC),
+        'available',
+        'Changed plan',
+        owner,
+    )
+
+    assert updated_calendar.id == calendar.id
+    assert updated_calendar.name == 'Updated vacation'
+    assert updated_calendar.timezone == 'Europe/Amsterdam'
+    assert updated_entry.id == entry.id
+    assert updated_entry.availability == 'available'
+    assert updated_entry.reason == 'Changed plan'

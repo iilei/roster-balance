@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import uuid4
@@ -101,6 +102,24 @@ class AvailabilityService:
             )
         )
 
+    def update_calendar(
+        self,
+        team_id: str,
+        calendar_id: str,
+        name: str,
+        timezone: str,
+        principal: Principal,
+    ) -> AvailabilityCalendar:
+        calendar = self.get_calendar(team_id, calendar_id, principal)
+        return self._calendars.save(
+            replace(
+                calendar,
+                name=name.strip(),
+                timezone=timezone.strip(),
+                updated_at=datetime.now(UTC),
+            )
+        )
+
     def list_entries(
         self, team_id: str, calendar_id: str, principal: Principal
     ) -> list[AvailabilityEntry]:
@@ -153,6 +172,39 @@ class AvailabilityService:
         if entry is None or entry.calendar_id != calendar_id:
             raise AvailabilityEntryNotFoundError(entry_id)
         self._entries.delete(entry_id)
+
+    def update_entry(
+        self,
+        team_id: str,
+        calendar_id: str,
+        entry_id: str,
+        starts_at: datetime,
+        ends_at: datetime,
+        availability: str,
+        reason: str | None,
+        principal: Principal,
+    ) -> AvailabilityEntry:
+        self.get_calendar(team_id, calendar_id, principal)
+        entry = self._entries.get(entry_id)
+        if entry is None or entry.calendar_id != calendar_id:
+            raise AvailabilityEntryNotFoundError(entry_id)
+        if ends_at <= starts_at:
+            raise ValueError('ends_at must be after starts_at')
+        if starts_at.tzinfo is None or ends_at.tzinfo is None:
+            raise ValueError('availability intervals must be timezone-aware')
+        normalized = availability.strip().casefold()
+        if normalized not in {'available', 'unavailable'}:
+            raise ValueError('availability must be available or unavailable')
+        return self._entries.save(
+            replace(
+                entry,
+                starts_at=starts_at,
+                ends_at=ends_at,
+                availability=normalized,
+                reason=reason.strip() if reason else None,
+                updated_at=datetime.now(UTC),
+            )
+        )
 
     def _authorize(self, team_id: str, principal: Principal) -> None:
         if not self._ownership.is_owner(team_id, principal.user_id):
