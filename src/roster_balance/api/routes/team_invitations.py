@@ -29,6 +29,7 @@ from roster_balance.application.services.team_invitation_service import (
 )
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
+    OwnershipConflictError,
 )
 from roster_balance.domain.models.principal import Principal
 from roster_balance.infrastructure.email.mailto_invitation_sender import (
@@ -140,6 +141,11 @@ def accept_invitation(
     except InvitationRecipientError as error:
         raise HTTPException(
             status_code=403, detail='Invitation recipient mismatch'
+        ) from error
+    except OwnershipConflictError as error:
+        raise HTTPException(
+            status_code=409,
+            detail='User is already a team member',
         ) from error
     except InvitationStateError as error:
         raise HTTPException(

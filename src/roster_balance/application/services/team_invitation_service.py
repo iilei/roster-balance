@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import hmac
 import secrets
 from dataclasses import replace
@@ -128,11 +127,9 @@ class TeamInvitationService:
         ):
             raise InvitationRecipientError(invitation_id)
         user = self._user_service.resolve(principal)
-        with contextlib.suppress(OwnershipConflictError):
-            self._ownership_service.add_member_from_invitation(
-                invitation.team_id,
-                user.id,
-            )
+        if self._ownership_service.is_member(invitation.team_id, user.id):
+            raise OwnershipConflictError(user.id)
+        self._ownership_service.add_member_from_invitation(invitation.team_id, user.id)
         accepted = replace(
             invitation,
             status='accepted',

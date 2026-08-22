@@ -13,6 +13,7 @@ from roster_balance.application.services.team_invitation_service import (
 )
 from roster_balance.application.services.team_ownership_service import (
     OwnershipAuthorizationError,
+    OwnershipConflictError,
     TeamOwnershipService,
 )
 from roster_balance.application.services.user_service import UserService
@@ -162,6 +163,23 @@ def test_wrong_recipient_cannot_accept_valid_token() -> None:
             invitation.id,
             sender.sent[0][1],
             Principal('local', 'bob', 'bob@example.com'),
+        )
+
+
+def test_accepting_invitation_for_an_existing_member_is_rejected() -> None:
+    service, sender, ownership_repository = make_service()
+    ownership_repository.add(
+        TeamOwnership('team', 'local:alice', 'member', datetime.now(UTC))
+    )
+    invitation = service.create_invitation(
+        'team', 'alice@example.com', Principal('local', 'owner')
+    )
+
+    with pytest.raises(OwnershipConflictError):
+        service.accept_invitation(
+            invitation.id,
+            sender.sent[0][1],
+            Principal('local', 'alice', 'alice@example.com'),
         )
 
 
